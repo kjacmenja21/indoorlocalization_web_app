@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: "Jost", sans-serif;
+}
+
+.layout {
+  display: flex;
+}
+
+.layout__navigation {
+  width: 10%;
+}
+
+.layout__content {
+  width: 90%;
+  position: relative;
+  top: 13px;
+}
