@@ -7,6 +7,7 @@ import AssetPage from "./pages/AssetPage";
 import ReportPage from "./pages/ReportPage";
 import Layout from "./shared/Layout";
 import Login from "./components/Login/Login.jsx";
+import PrivateRoute from "./core/guard/privateRoute.jsx";
 
 function App() {
   return (
@@ -15,9 +16,9 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/asset" element={<AssetPage />} />
-          <Route path="/report" element={<ReportPage />} />
+          <Route path="/dashboard" element={<PrivateRoute element={DashboardPage} />} />
+          <Route path="/asset" element={<PrivateRoute element={AssetPage} />} />
+          <Route path="/report" element={<PrivateRoute element={ReportPage} />} />
         </Routes>
       </Layout>
     </div>
