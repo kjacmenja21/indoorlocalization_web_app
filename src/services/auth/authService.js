@@ -17,6 +17,11 @@ export const AuthService = {
       }
       throw new Error("Login failed: No tokens returned from server");
     } catch (error) {
+      //TODO: Remove, ovo je jos dok ne mozemo napravit poziv za login
+      console.log("Login failed: No tokens returned from server");
+        localStorage.setItem("accessToken", "test");
+        localStorage.setItem("refreshToken", "test");
+        localStorage.setItem("currentUser", JSON.stringify({role: "admin"}));
       const errorMessage =
         error.response?.data?.message ||
         error.message ||

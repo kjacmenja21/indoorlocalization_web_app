@@ -17,6 +17,8 @@ const Login = () => {
       // Redirect to dashboard or another page after successful login
       window.location.href = "/dashboard";
     } catch (err) {
+      // TODO: Remove kada se implementira login logika na backendu
+      window.location.href = "/dashboard";
       setError(err.message);
     }
   };
