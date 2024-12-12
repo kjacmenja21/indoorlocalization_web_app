@@ -73,6 +73,28 @@ export const AssetService = {
         return assetList;
     },
 
+    getPaginatedAssets: async (page = 1, itemsPerPage = 5) => {
+        /*Ovako ce izlgedati poziv ka BE-u, ali posto nemamo BE, koristicemo dummy podatke
+       try{
+           const response = await axiosInstance.get(API_PATHS.ASSETS_GET_ALL, {
+                params: {
+                    page: page,
+                    items_per_page: itemsPerPage,
+                },
+            });
+           return response.data;
+       } catch (error) {
+           const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch assets';
+           console.error(`Error fetching assets: ${errorMessage}`);
+       }*/
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return {
+            data: assetList.slice(startIndex, endIndex),
+            total: assetList.length,
+        };
+    },
+
     updateAsset: async (assetId, updatedData) => {
         // Simulated backend call
         /*Ovako ce izlgedati poziv ka BE-u, ali posto nemamo BE, koristicemo dummy podatke
@@ -109,5 +131,30 @@ export const AssetService = {
         // Remove asset from the list
         const deletedAsset = assetList.splice(assetIndex, 1)[0];
         return deletedAsset;
+    },
+
+    addAsset: async (newAsset) => {
+        try {
+            // Simulate backend call to add asset
+            /*
+            try {
+            const response = await axiosInstance.post(`${API_PATHS.ASSETS_POST}`, { asset: newAsset });
+            return response.data;
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create project';
+            console.error(`Error creating project for course ${courseId}: ${errorMessage}`);
+            throw new Error(errorMessage);
+        }
+            */
+            const newId = assetList.length ? Math.max(...assetList.map(asset => asset.id)) + 1 : 1;  // Auto-generate ID
+            const assetWithId = { ...newAsset, id: newId, lastSync: new Date().toISOString() }; // Add ID and lastSync
+            console.log("Lista prije dodavanja:", assetList);
+            assetList.push(assetWithId);
+            console.log("Added asset:", assetWithId);
+            console.log("Lista poslije dodavanja:", assetList);
+            return assetWithId;  // Return the newly added asset
+        } catch (error) {
+            console.error("Error adding asset:", error.message);
+        }
     },
 };

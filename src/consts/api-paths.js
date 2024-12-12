@@ -5,8 +5,10 @@ export const API_PATHS = {
   /* ASSETS */
   ASSETS_GET_ALL: "assets/get/all",
   ASSETS_GET_BY_ID: "assets/get",
+  ASSETS_GET_PAGINATED: "assets/get",
   ASSETS_PUT: "assets/put",
   ASSETS_DELETE: "assets/delete",
+  ASSETS_POST: "assets/post",
 
   /* FLOORMAPS */
   FLOORMAPS_GET_ALL: "floormaps/get/all",
