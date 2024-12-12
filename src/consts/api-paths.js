@@ -7,4 +7,10 @@ export const API_PATHS = {
   ASSETS_GET_BY_ID: "assets/get",
   ASSETS_PUT: "assets/put",
   ASSETS_DELETE: "assets/delete",
+
+  /* FLOORMAPS */
+  FLOORMAPS_GET_ALL: "floormaps/get/all",
+  FLOORMAPS_GET_BY_ID: "floormaps/get",
+  FLOORMAPS_PUT: "floormaps/put",
+  FLOORMAPS_DELETE: "floormaps/delete",
 };
