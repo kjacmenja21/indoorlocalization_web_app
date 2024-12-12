@@ -8,6 +8,7 @@ import ReportPage from "./pages/ReportPage";
 import Layout from "./shared/Layout";
 import Login from "./components/Login/Login.jsx";
 import PrivateRoute from "./core/guard/privateRoute.jsx";
+import AssetDetailPage from "./pages/AssetDetailPage.jsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<PrivateRoute element={DashboardPage} />} />
           <Route path="/asset" element={<PrivateRoute element={AssetPage} />} />
+          <Route path="/assets/:id" element={<PrivateRoute element={AssetDetailPage} />} />
           <Route path="/report" element={<PrivateRoute element={ReportPage} />} />
         </Routes>
       </Layout>
