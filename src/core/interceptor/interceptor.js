@@ -1,6 +1,6 @@
 import axios from "axios";
 import { environment } from "../../consts/envierment-prod.js";
-import { AuthService } from "../auth/authService.js";
+import { AuthService } from "../../services/auth/authService.js";
 const apiUrl = environment.apiUrl;
 
 const axiosInstance = axios.create({

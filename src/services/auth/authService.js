@@ -1,4 +1,4 @@
-import axiosInstance from "../interceptor/interceptor";
+import axiosInstance from "../../core/interceptor/interceptor";
 import { API_PATHS } from "../../consts/api-paths";
 
 export const AuthService = {
