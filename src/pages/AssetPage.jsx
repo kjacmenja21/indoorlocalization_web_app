@@ -1,7 +1,7 @@
 import React from "react";
 
 function AssetPage() {
-  return <div>AssetPage</div>;
+  return <div>Asset</div>;
 }
 
 export default AssetPage;
