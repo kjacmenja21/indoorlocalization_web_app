@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Login from "../components/Login/Login";
 import { AuthService } from "../services/auth/authService";
-import {FloorMapService} from "../services/auth/floormapService.js"; // Assuming AuthService exists
+import {FloorMapService} from "../services/floormapService.js"; // Assuming AuthService exists
 
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
