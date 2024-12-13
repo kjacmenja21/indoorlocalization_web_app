@@ -6,8 +6,11 @@ This React-based web application will feature a dashboard providing statistics a
 
 This project uses the following technologies:
 
-- React (version 8.3.1)
-- NPM (version 10.8.2)
+- React
+- NPM 
+- Vite (build tool)
+- Material UI (for styling and UI components)
+- Axios (for making HTTP requests)
 
 ## Setup
 
