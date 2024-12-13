@@ -8,8 +8,17 @@ export const AuthService = {
         username: username,
         password: password,
       };
-      const response = await axiosInstance.post(API_PATHS.LOGIN, new URLSearchParams(data));
-      if (response.data && response.data.tokens) {
+      const response = await axiosInstance.post(
+        API_PATHS.LOGIN,
+        new URLSearchParams(data)
+      );
+      console.log("response: ", response);
+      if (
+        response.data &&
+        response.data.access_token &&
+        response.data.refresh_token
+      ) {
+        console.log("response: ", response);
         localStorage.setItem("accessToken", response.access_token);
         localStorage.setItem("refreshToken", response.refresh_token);
         localStorage.setItem("currentUser", JSON.stringify(response.data));
@@ -20,7 +29,7 @@ export const AuthService = {
     } catch (error) {
       //TODO: Remove, ovo je jos dok ne mozemo napravit poziv za login
       console.log("Login failed: No tokens returned from server");
-        /*localStorage.setItem("accessToken", "test");
+      /*localStorage.setItem("accessToken", "test");
         localStorage.setItem("refreshToken", "test");
         localStorage.setItem("currentUser", JSON.stringify({role: "admin"}));*/
       const errorMessage =
