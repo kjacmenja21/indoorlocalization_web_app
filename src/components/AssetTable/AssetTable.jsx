@@ -42,10 +42,13 @@ const AssetTable = ({ assets, onNavigate }) => {
           <div className="responsive-table__column responsive-table__column--4">
             Y
           </div>
-          <div className="responsive-table__column responsive-table__column--4">
+          <div className="responsive-table__column responsive-table__column--5">
+            Last Sync
+          </div>
+          <div className="responsive-table__column responsive-table__column--6">
             Floor Map Name
           </div>
-          <div className="responsive-table__column responsive-table__column--4">
+          <div className="responsive-table__column responsive-table__column--7">
             Details
           </div>
         </li>
@@ -62,37 +65,37 @@ const AssetTable = ({ assets, onNavigate }) => {
                 {asset.id}
               </div>
               <div
-                className="responsive-table__column responsive-table__column--1"
+                className="responsive-table__column responsive-table__column--2"
                 data-label="Name"
               >
                 {asset.name}
               </div>
               <div
-                className="responsive-table__column responsive-table__column--2"
+                className="responsive-table__column responsive-table__column--3"
                 data-label="X"
               >
                 {asset.x}
               </div>
               <div
-                className="responsive-table__column responsive-table__column--3"
+                className="responsive-table__column responsive-table__column--4"
                 data-label="Y"
               >
                 {asset.y}
               </div>
               <div
-                className="responsive-table__column responsive-table__column--4"
+                className="responsive-table__column responsive-table__column--5"
                 data-label="Last sync"
               >
                 {new Date(asset.lastSync).toLocaleString()}
               </div>
               <div
-                className="responsive-table__column responsive-table__column--4"
+                className="responsive-table__column responsive-table__column--6"
                 data-label="Floor Map Name"
               >
                 {asset.floorMapName}
               </div>
               <div
-                className="responsive-table__column responsive-table__column--4"
+                className="responsive-table__column responsive-table__column--7"
                 data-label="Details"
               >
                 <button
