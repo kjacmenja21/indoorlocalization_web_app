@@ -25,7 +25,7 @@ Follow these steps to set up the project on your local machine:
 2. Navigate to the project directory:
 
    ```bash
-   cd project-name
+   cd indoorlocalization_web_app
    ```
 
 3. Install all dependencies using npm or yarn:
