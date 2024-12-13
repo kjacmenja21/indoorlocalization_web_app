@@ -50,15 +50,15 @@ let assetList = [
 ];
 export const AssetService = {
     getAssetById: async (assetId) => {
-        /*
+
         try{
             const response = await axiosInstance.get(`${API_PATHS.ASSETS_GET_BY_ID}/${assetId}`);
             return response.data;
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch asset';
             console.error(`Error fetching asset ${assetId}: ${errorMessage}`);
-        }*/
-        return assetList.find(asset => asset.id === assetId);
+        }/*
+        return assetList.find(asset => asset.id === assetId);*/
     },
 
     getAllAssets: async () => {

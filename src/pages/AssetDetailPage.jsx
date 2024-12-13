@@ -1,23 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { AssetService } from "../services/assetService.js";
+import React from "react";
+import { useLocation } from "react-router-dom";
 
 function AssetDetailPage() {
-    const { id } = useParams();
-    const [asset, setAsset] = useState(null);
-
-    useEffect(() => {
-        const fetchAsset = async () => {
-            try {
-                const fetchedAsset = await AssetService.getAssetById(Number(id));
-                setAsset(fetchedAsset);
-            } catch (error) {
-                console.error("Error fetching asset details:", error.message);
-            }
-        };
-
-        fetchAsset();
-    }, [id]);
+    const { state } = useLocation();
+    const asset = state?.asset;
 
     return (
         <div>
@@ -28,11 +14,11 @@ function AssetDetailPage() {
                     <p><strong>Name:</strong> {asset.name}</p>
                     <p><strong>X:</strong> {asset.x}</p>
                     <p><strong>Y:</strong> {asset.y}</p>
-                    <p><strong>Last Sync:</strong> {new Date(asset.lastSync).toLocaleString()}</p>
-                    <p><strong>Floor Map Name:</strong> {asset.floorMapName}</p>
+                    <p><strong>Last Sync:</strong> {new Date(asset.last_sync).toLocaleString()}</p>
+                    <p><strong>Floor Map Name:</strong> {asset.floormap_id}</p>
                 </div>
             ) : (
-                <p>Loading asset details...</p>
+                <p>No asset details provided.</p>
             )}
         </div>
     );

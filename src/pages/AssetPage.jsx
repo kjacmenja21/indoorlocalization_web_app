@@ -81,7 +81,7 @@ function AssetPage() {
           (currentPage - 1) * itemsPerPage,
           currentPage * itemsPerPage
         )}
-        onNavigate={(id) => navigate(`/assets/${id}`)}
+        onNavigate={(asset) => navigate(`/assets/${asset.id}`, { state: { asset } })}
       />
       <div
         style={{
