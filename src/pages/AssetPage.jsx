@@ -22,7 +22,7 @@ function AssetPage() {
           itemsPerPage
         );
         setAssets(data);
-        setTotalAssets(total); // Keep track of total assets for pagination
+        setTotalAssets(total);
       } catch (error) {
         console.error("Error fetching paginated assets:", error.message);
       }
