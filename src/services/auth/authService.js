@@ -1,22 +1,37 @@
-import axiosInstance from "../interceptor/interceptor";
+import axiosInstance from "../../core/interceptor/interceptor";
 import { API_PATHS } from "../../consts/api-paths";
 
 export const AuthService = {
   login: async (username, password) => {
     try {
-      const response = await axiosInstance.post(API_PATHS.LOGIN, {
-        username,
-        password,
-      });
-      if (response.data && response.data.tokens) {
-        localStorage.setItem("accessToken", response.data.tokens.accessToken);
-        localStorage.setItem("refreshToken", response.data.tokens.refreshToken);
-        localStorage.setItem("currentUser", JSON.stringify(response.data.user));
+      let data = {
+        username: username,
+        password: password,
+      };
+      const response = await axiosInstance.post(
+        API_PATHS.LOGIN,
+        new URLSearchParams(data)
+      );
+      console.log("response: ", response);
+      if (
+        response.data &&
+        response.data.access_token &&
+        response.data.refresh_token
+      ) {
+        console.log("response: ", response);
+        localStorage.setItem("accessToken", response.data.access_token);
+        localStorage.setItem("refresh-token", response.data.refresh_token);
+        localStorage.setItem("currentUser", JSON.stringify(response.data));
 
         return response.data;
       }
       throw new Error("Login failed: No tokens returned from server");
     } catch (error) {
+      //TODO: Remove, ovo je jos dok ne mozemo napravit poziv za login
+      console.log("Login failed: No tokens returned from server");
+      /*localStorage.setItem("accessToken", "test");
+        localStorage.setItem("refreshToken", "test");
+        localStorage.setItem("currentUser", JSON.stringify({role: "admin"}));*/
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
