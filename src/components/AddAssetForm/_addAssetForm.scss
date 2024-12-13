@@ -1,0 +1,122 @@
+.add-asset-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 149, 218, 1),
+    rgba(0, 149, 218, 1)
+  );
+  border-radius: 10px;
+  box-shadow: rgba(149, 157, 165, 0.2) 2px 8px 24px;
+  box-sizing: border-box;
+  padding: 20px;
+  width: 320px;
+  height: 500px;
+
+  &__title {
+    color: #eee;
+    font-family: sans-serif;
+    font-size: 36px;
+    font-weight: 600;
+    margin-top: 30px;
+  }
+
+  &__input-group {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin-top: 30px;
+
+    &:first-child {
+      margin-top: 40px;
+    }
+  }
+
+  //   width: 60%;
+  //   height: 20px;
+  //   background: #f1f1f1;
+  //   justify-content: center;
+  //   display: flex;
+  //   margin: 20px auto;
+  //   padding: 10px;
+  //   border: none;
+  //   outline: none;
+  //   border-radius: 5px;
+  &__input {
+    background: #f1f1f1;
+    border: none;
+    border-radius: 5px;
+    color: #eee;
+    font-size: 18px;
+    height: 100%;
+    padding: 4px 20px 0;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+
+    &:focus {
+      border: none;
+    }
+
+    &:focus ~ .add-asset-form__placeholder,
+    &:not(:placeholder-shown) ~ .add-asset-form__placeholder {
+      transform: translateY(-30px) translateX(10px) scale(0.75);
+      color: #eee;
+    }
+
+    &:not(:placeholder-shown) ~ .add-asset-form__placeholder {
+      color: #808097;
+    }
+  }
+
+  &__placeholder {
+    position: absolute;
+    left: 20px;
+    top: 12px;
+    font-family: sans-serif;
+    color: #65657b;
+    font-size: 14px;
+    line-height: 14px;
+    transform-origin: 0 50%;
+    pointer-events: none;
+    transition: transform 200ms, color 200ms;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 38px;
+    width: 100%;
+  }
+
+  &__button {
+    background-color: #08d;
+    border: none;
+    border-radius: 5px;
+    color: #eee;
+    font-size: 18px;
+    height: 50px;
+    cursor: pointer;
+    text-align: center;
+    height: 35px;
+    width: 30%;
+
+    &--submit {
+      background-color: rgb(0, 182, 15);
+
+      &:active {
+        background-color: #06b;
+      }
+    }
+
+    &--cancel {
+      background-color: #dc2f55;
+
+      &:active {
+        background-color: #b0223e;
+      }
+    }
+  }
+}

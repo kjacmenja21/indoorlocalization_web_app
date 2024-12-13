@@ -16,61 +16,90 @@ function AddAssetForm({ onAddAsset, onCancel }) {
   };
 
   return (
-    <form
-      onSubmit={handleAddAsset}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        marginBottom: "20px",
-      }}
-    >
-      <h3>Add New Asset</h3>
-      <label>
-        Name:
+    <form className="add-asset-form" onSubmit={handleAddAsset}>
+      <h3 className="add-asset-form__title">Add New Asset</h3>
+
+      <div className="add-asset-form__input-group">
         <input
+          id="name"
+          className="add-asset-form__input"
           type="text"
           value={newAsset.name}
           onChange={(e) => setNewAsset({ ...newAsset, name: e.target.value })}
           required
+          placeholder=" "
         />
-      </label>
-      <label>
-        X Coordinate:
+        <label className="add-asset-form__placeholder" htmlFor="name">
+          Name
+        </label>
+      </div>
+
+      <div className="add-asset-form__input-group">
         <input
+          id="x-coordinate"
+          className="add-asset-form__input"
           type="number"
           value={newAsset.x}
           onChange={(e) =>
             setNewAsset({ ...newAsset, x: Number(e.target.value) })
           }
           required
+          placeholder=" "
         />
-      </label>
-      <label>
-        Y Coordinate:
+        <label className="add-asset-form__placeholder" htmlFor="x-coordinate">
+          X Coordinate
+        </label>
+      </div>
+
+      <div className="add-asset-form__input-group">
         <input
+          id="y-coordinate"
+          className="add-asset-form__input"
           type="number"
           value={newAsset.y}
           onChange={(e) =>
             setNewAsset({ ...newAsset, y: Number(e.target.value) })
           }
           required
+          placeholder=" "
         />
-      </label>
-      <label>
-        Floor Map Name:
+        <label className="add-asset-form__placeholder" htmlFor="y-coordinate">
+          Y Coordinate
+        </label>
+      </div>
+
+      <div className="add-asset-form__input-group">
         <input
+          id="floor-map-name"
+          className="add-asset-form__input"
           type="text"
           value={newAsset.floorMapName}
           onChange={(e) =>
             setNewAsset({ ...newAsset, floorMapName: e.target.value })
           }
           required
+          placeholder=" "
         />
-      </label>
-      <button type="submit">Add</button>
-      <button type="button" onClick={onCancel}>
-        Cancel
-      </button>
+        <label className="add-asset-form__placeholder" htmlFor="floor-map-name">
+          Floor Map Name
+        </label>
+      </div>
+
+      <div className="add-asset-form__actions">
+        <button
+          className="add-asset-form__button add-asset-form__button--submit"
+          type="submit"
+        >
+          Add
+        </button>
+        <button
+          className="add-asset-form__button add-asset-form__button--cancel"
+          type="button"
+          onClick={onCancel}
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   );
 }

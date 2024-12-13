@@ -58,6 +58,7 @@
 
   &__text {
     position: absolute;
+    z-index: 1;
     background-color: #006391;
     padding: 0.5rem 1rem;
     border-radius: 6px;
