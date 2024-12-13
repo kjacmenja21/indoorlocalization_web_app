@@ -17,12 +17,12 @@ function AssetPage() {
   useEffect(() => {
     const fetchPaginatedAssets = async () => {
       try {
-        const { data, total } = await AssetService.getPaginatedAssets(
+        const { current_page, total_pages, page_limit, page } = await AssetService.getPaginatedAssets(
           currentPage,
           itemsPerPage
         );
-        setAssets(data);
-        setTotalAssets(total);
+        setAssets(page);
+        setTotalAssets(page_limit);
       } catch (error) {
         console.error("Error fetching paginated assets:", error.message);
       }

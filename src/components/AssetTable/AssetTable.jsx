@@ -86,13 +86,13 @@ const AssetTable = ({ assets, onNavigate }) => {
                 className="responsive-table__column responsive-table__column--5"
                 data-label="Last sync"
               >
-                {new Date(asset.lastSync).toLocaleString()}
+                {new Date(asset.last_sync).toLocaleString()}
               </div>
               <div
                 className="responsive-table__column responsive-table__column--6"
                 data-label="Floor Map Name"
               >
-                {asset.floorMapName}
+                {asset.floormap_id}
               </div>
               <div
                 className="responsive-table__column responsive-table__column--7"
