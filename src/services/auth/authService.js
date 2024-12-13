@@ -9,7 +9,9 @@ export const AuthService = {
         password: password,
       };
       const response = await axiosInstance.post(API_PATHS.LOGIN, new URLSearchParams(data));
-      if (response.data && response.data.tokens) {
+      console.log("response: ", response);
+      if (response.data && response.data.access_token && response.data.refresh_token) {
+        console.log("response: ", response);
         localStorage.setItem("accessToken", response.access_token);
         localStorage.setItem("refreshToken", response.refresh_token);
         localStorage.setItem("currentUser", JSON.stringify(response.data));

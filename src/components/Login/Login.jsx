@@ -15,7 +15,7 @@ const Login = () => {
       const response = await AuthService.login(username, password);
       console.log("Login successful:", response);
       // Redirect to dashboard or another page after successful login
-      //window.location.href = "/dashboard";
+      window.location.href = "/dashboard";
     } catch (err) {
       // TODO: Remove kada se implementira login logika na backendu
       //window.location.href = "/dashboard";
