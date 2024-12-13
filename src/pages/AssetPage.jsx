@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AssetService } from "../services/auth/assetService.js";
+import { AssetService } from "../services/assetService.js";
 import AssetTable from "../components/AssetTable/AssetTable.jsx";
 import AddAssetForm from "../components/AddAssetForm/AddAssetForm.jsx";
 
@@ -22,7 +22,7 @@ function AssetPage() {
           itemsPerPage
         );
         setAssets(data);
-        setTotalAssets(total); // Keep track of total assets for pagination
+        setTotalAssets(total);
       } catch (error) {
         console.error("Error fetching paginated assets:", error.message);
       }

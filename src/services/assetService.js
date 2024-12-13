@@ -1,5 +1,5 @@
-import axiosInstance from "../../core/interceptor/interceptor.js";
-import {API_PATHS} from "../../consts/api-paths.js";
+import axiosInstance from "../core/interceptor/interceptor.js";
+import {API_PATHS} from "../consts/api-paths.js";
 
 let assetList = [
     {
@@ -50,7 +50,7 @@ let assetList = [
 ];
 export const AssetService = {
     getAssetById: async (assetId) => {
-        /*Ovako ce izlgedati poziv ka BE-u, ali posto nemamo BE, koristicemo dummy podatke
+        /*
         try{
             const response = await axiosInstance.get(`${API_PATHS.ASSETS_GET_BY_ID}/${assetId}`);
             return response.data;
@@ -62,7 +62,7 @@ export const AssetService = {
     },
 
     getAllAssets: async () => {
-        /*Ovako ce izlgedati poziv ka BE-u, ali posto nemamo BE, koristicemo dummy podatke
+        /*
         try{
             const response = await axiosInstance.get(API_PATHS.ASSETS_GET_ALL);
             return response.data;
@@ -74,12 +74,12 @@ export const AssetService = {
     },
 
     getPaginatedAssets: async (page = 1, itemsPerPage = 5) => {
-        /*Ovako ce izlgedati poziv ka BE-u, ali posto nemamo BE, koristicemo dummy podatke
+        /*
        try{
            const response = await axiosInstance.get(API_PATHS.ASSETS_GET_ALL, {
                 params: {
                     page: page,
-                    items_per_page: itemsPerPage,
+                    limit: itemsPerPage,
                 },
             });
            return response.data;
@@ -96,8 +96,7 @@ export const AssetService = {
     },
 
     updateAsset: async (assetId, updatedData) => {
-        // Simulated backend call
-        /*Ovako ce izlgedati poziv ka BE-u, ali posto nemamo BE, koristicemo dummy podatke
+        /*
         try{
             const response = await axiosInstance.put('API_PATHS.ASSETS_PUT/${assetId}', updatedData);
             return response.data;
@@ -115,8 +114,7 @@ export const AssetService = {
     },
 
     deleteAsset: async (assetId) => {
-        // Simulated backend call
-        /*Ovako ce izlgedati poziv ka BE-u, ali posto nemamo BE, koristicemo dummy podatke
+        /*
        try{
            const response = await axiosInstance.delete('API_PATHS.ASSETS_DELETE/${assetId}');
            return response.data;
@@ -135,7 +133,6 @@ export const AssetService = {
 
     addAsset: async (newAsset) => {
         try {
-            // Simulate backend call to add asset
             /*
             try {
             const response = await axiosInstance.post(`${API_PATHS.ASSETS_POST}`, { asset: newAsset });

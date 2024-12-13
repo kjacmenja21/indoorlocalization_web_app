@@ -1,5 +1,5 @@
-import axiosInstance from "../../core/interceptor/interceptor.js";
-import { API_PATHS } from "../../consts/api-paths.js";
+import axiosInstance from "../core/interceptor/interceptor.js";
+import { API_PATHS } from "../consts/api-paths.js";
 
 let floorMapList = [
     {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AssetService } from "../services/auth/assetService.js";
+import { AssetService } from "../services/assetService.js";
 
 function AssetDetailPage() {
     const { id } = useParams();

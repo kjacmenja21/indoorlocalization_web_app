@@ -19,8 +19,8 @@ export const AuthService = {
         response.data.refresh_token
       ) {
         console.log("response: ", response);
-        localStorage.setItem("accessToken", response.access_token);
-        localStorage.setItem("refreshToken", response.refresh_token);
+        localStorage.setItem("accessToken", response.data.access_token);
+        localStorage.setItem("refresh-token", response.data.refresh_token);
         localStorage.setItem("currentUser", JSON.stringify(response.data));
 
         return response.data;

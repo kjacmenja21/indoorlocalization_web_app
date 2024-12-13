@@ -8,18 +8,29 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.authorization = `Bearer ${token}`;
-      config.headers.contentType = "application/x-www-form-urlencoded";
+    (config) => {
+        const token = localStorage.getItem("accessToken");
+
+        // Add token if it exists
+        if (token) {
+            console.log("accessToken", token);
+            config.headers.authorization = `Bearer ${token}`;
+        }
+
+        // Apply contentType only for login requests
+        if (config.url.includes("login") || config.method === "post") {
+            config.headers.contentType = "application/x-www-form-urlencoded";
+        }else{
+            config.headers.contentType = "application/json";
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
 );
+
 
 axiosInstance.interceptors.response.use(
   (response) => response,
