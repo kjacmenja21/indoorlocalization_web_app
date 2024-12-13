@@ -1,0 +1,6 @@
+[phases]
+build = "npm run build"
+start = "caddy run --config Caddyfile"
+
+[static]
+path = "dist"
