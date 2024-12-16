@@ -1,22 +1,22 @@
 import React from "react";
+import "./_pagination.scss";
 
 function Pagination({ currentPage, totalPages, onPageChange }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginTop: "20px",
-      }}
-    >
-      <button onClick={() => onPageChange("prev")} disabled={currentPage === 1}>
+    <div className="pagination">
+      <button
+        className="pagination__button pagination__button--prev"
+        onClick={() => onPageChange("prev")}
+        disabled={currentPage === 1}
+      >
         Previous
       </button>
-      <span>
-        Page {currentPage} of {totalPages}
+      <span className="pagination__info">
+        Page <span className="pagination__current">{currentPage}</span> of{" "}
+        <span className="pagination__total">{totalPages}</span>
       </span>
       <button
+        className="pagination__button pagination__button--next"
         onClick={() => onPageChange("next")}
         disabled={currentPage === totalPages}
       >
