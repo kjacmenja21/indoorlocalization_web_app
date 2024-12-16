@@ -1,45 +1,59 @@
 import React, { useState } from "react";
-import "./_odal.scss"; // Import the Sass file
+import { IoIosClose } from "react-icons/io";
+import "./_modal.scss";
 
-function Modal({ isOpen, onClose, title, children }) {
-  if (!isOpen) return null; // Don't render if the modal is closed
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const Modal = ({ buttonText, title, children }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const toggleModal = () => {
+    setIsOpen((prevState) => !prevState);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
 
   return (
-    <div className="modal__overlay" onClick={onClose}>
-      <div
-        className="modal__container"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
-      >
-        <button className="modal__close" onClick={onClose}>
-          &times;
+    <div className="container">
+      <div className="details-container">
+        {/* Button to trigger the modal */}
+        <button className="button" onClick={toggleModal}>
+          {buttonText}
         </button>
-        <h2 className="modal__title">{title}</h2>
-        <div className="modal__content">{children}</div>
+
+        {/* Modal Overlay and Modal */}
+        {isOpen && (
+          <>
+            {/* Overlay */}
+            <div
+              className="details-modal-overlay"
+              onClick={closeModal} // Clicking the overlay closes the modal
+            ></div>
+
+            {/* Modal */}
+            <div className="details-modal">
+              {/* Close Button */}
+
+              {/* Modal Title */}
+              <div className="details-modal-title">
+                <h1>{title}</h1>
+                <IoIosClose
+                  className="details-modal-close"
+                  onClick={closeModal}
+                />
+              </div>
+
+              {/* Modal Content */}
+              <div className="details-modal-content">
+                {" "}
+                {React.cloneElement(children, { closeModal })}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
-}
+};
 
-function App() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  return (
-    <div>
-      <button className="app__button" onClick={openModal}>
-        Open Modal
-      </button>
-      <Modal isOpen={isModalOpen} onClose={closeModal} title="My Modal">
-        <p>This is the content of the modal!</p>
-      </Modal>
-    </div>
-  );
-}
-
-export default App;
+export default Modal;

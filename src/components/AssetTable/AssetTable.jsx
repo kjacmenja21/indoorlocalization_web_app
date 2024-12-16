@@ -92,7 +92,7 @@ const AssetTable = ({ assets, onNavigate }) => {
                 className="responsive-table__column responsive-table__column--6"
                 data-label="Floor Map Name"
               >
-                {asset.floormap_id}
+                {asset.floorMapName}
               </div>
               <div
                 className="responsive-table__column responsive-table__column--7"

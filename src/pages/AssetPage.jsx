@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AssetService } from "../services/assetService.js";
 import AssetTable from "../components/AssetTable/AssetTable.jsx";
 import AddAssetForm from "../components/AddAssetForm/AddAssetForm.jsx";
+import Modal from "../components/Modal/Modal.jsx";
 import "./_pages.scss";
 
 function AssetPage() {
@@ -10,6 +11,7 @@ function AssetPage() {
   const [totalAssets, setTotalAssets] = useState(0); // Track total assets
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const itemsPerPage = 5;
@@ -67,21 +69,12 @@ function AssetPage() {
           <h2>Asset List</h2>
         </div>
         <div className="asset-container__content">
-          <button
-            style={{ marginBottom: "10px", padding: "10px", fontSize: "16px" }}
-            onClick={() => setShowAddForm(true)}
-          >
-            Add Asset
-          </button>
+          <Modal buttonText="Add asset" title="Add new asset">
+            <AddAssetForm onAddAsset={handleAddAsset} />
+          </Modal>
         </div>
       </div>
 
-      {showAddForm && (
-        <AddAssetForm
-          onAddAsset={handleAddAsset}
-          onCancel={() => setShowAddForm(false)}
-        />
-      )}
       <AssetTable
         assets={assets.slice(
           (currentPage - 1) * itemsPerPage,

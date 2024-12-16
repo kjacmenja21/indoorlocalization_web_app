@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "./_addAssetForm.scss";
+import Modal from "../Modal/Modal";
 
-function AddAssetForm({ onAddAsset, onCancel }) {
+function AddAssetForm({ onAddAsset, closeModal }) {
   const [newAsset, setNewAsset] = useState({
     name: "",
     x: 0,
@@ -17,8 +18,6 @@ function AddAssetForm({ onAddAsset, onCancel }) {
 
   return (
     <form className="add-asset-form" onSubmit={handleAddAsset}>
-      <h3 className="add-asset-form__title">Add New Asset</h3>
-
       <div className="add-asset-form__input-group">
         <input
           id="name"
@@ -89,13 +88,20 @@ function AddAssetForm({ onAddAsset, onCancel }) {
         <button
           className="add-asset-form__button add-asset-form__button--submit"
           type="submit"
+          onClick={(e) => {
+            e.preventDefault();
+            closeModal();
+          }}
         >
           Add
         </button>
         <button
           className="add-asset-form__button add-asset-form__button--cancel"
           type="button"
-          onClick={onCancel}
+          onClick={(e) => {
+            e.preventDefault();
+            closeModal();
+          }}
         >
           Cancel
         </button>
