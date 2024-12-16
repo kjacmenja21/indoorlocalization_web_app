@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AssetService } from "../services/assetService.js";
 import AssetTable from "../components/AssetTable/AssetTable.jsx";
 import AddAssetForm from "../components/AddAssetForm/AddAssetForm.jsx";
+import "./_pages.scss";
 
 function AssetPage() {
   const [assets, setAssets] = useState([]);
@@ -17,10 +18,8 @@ function AssetPage() {
   useEffect(() => {
     const fetchPaginatedAssets = async () => {
       try {
-        const { current_page, total_pages, page_limit, page } = await AssetService.getPaginatedAssets(
-          currentPage,
-          itemsPerPage
-        );
+        const { current_page, total_pages, page_limit, page } =
+          await AssetService.getPaginatedAssets(currentPage, itemsPerPage);
         setAssets(page);
         setTotalAssets(page_limit);
       } catch (error) {
@@ -63,13 +62,20 @@ function AssetPage() {
 
   return (
     <div>
-      <h2>Asset List</h2>
-      <button
-        style={{ marginBottom: "10px", padding: "10px", fontSize: "16px" }}
-        onClick={() => setShowAddForm(true)}
-      >
-        Add Asset
-      </button>
+      <div className="asset-container">
+        <div className="asset-container__header">
+          <h2>Asset List</h2>
+        </div>
+        <div className="asset-container__content">
+          <button
+            style={{ marginBottom: "10px", padding: "10px", fontSize: "16px" }}
+            onClick={() => setShowAddForm(true)}
+          >
+            Add Asset
+          </button>
+        </div>
+      </div>
+
       {showAddForm && (
         <AddAssetForm
           onAddAsset={handleAddAsset}
@@ -81,7 +87,9 @@ function AssetPage() {
           (currentPage - 1) * itemsPerPage,
           currentPage * itemsPerPage
         )}
-        onNavigate={(asset) => navigate(`/assets/${asset.id}`, { state: { asset } })}
+        onNavigate={(asset) =>
+          navigate(`/assets/${asset.id}`, { state: { asset } })
+        }
       />
       <div
         style={{

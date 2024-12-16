@@ -1,0 +1,15 @@
+.asset-container {
+  display: flex;
+  align-items: center;
+  width: 95%;
+
+  &__header {
+    width: 50%;
+  }
+
+  &__content {
+    width: 50%;
+    display: flex; /* Make it a flex container */
+    justify-content: flex-end; /* Align content to the end (right) */
+  }
+}
