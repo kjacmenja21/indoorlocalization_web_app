@@ -4,14 +4,14 @@ import { AssetService } from "../services/assetService.js";
 import AssetTable from "../components/AssetTable/AssetTable.jsx";
 import AddAssetForm from "../components/AddAssetForm/AddAssetForm.jsx";
 import Modal from "../components/Modal/Modal.jsx";
+import Pagination from "../components/Pagination/Pagination.jsx";
 import "./_pages.scss";
 
 function AssetPage() {
   const [assets, setAssets] = useState([]);
-  const [totalAssets, setTotalAssets] = useState(0); // Track total assets
+  const [totalAssets, setTotalAssets] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const itemsPerPage = 5;
@@ -84,30 +84,12 @@ function AssetPage() {
           navigate(`/assets/${asset.id}`, { state: { asset } })
         }
       />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "20px",
-        }}
-      >
-        <button
-          onClick={() => handlePageChange("prev")}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange("next")}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 }
