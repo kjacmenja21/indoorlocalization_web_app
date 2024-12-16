@@ -12,8 +12,9 @@ function AddAssetForm({ onAddAsset, closeModal }) {
 
   const handleAddAsset = (e) => {
     e.preventDefault();
-    onAddAsset(newAsset);
-    setNewAsset({ name: "", x: 0, y: 0, floorMapName: "" });
+    onAddAsset(newAsset); // Submit the asset
+    closeModal(); // Close the modal after submission
+    setNewAsset({ name: "", x: 0, y: 0, floorMapName: "" }); // Reset the form
   };
 
   return (
@@ -88,13 +89,10 @@ function AddAssetForm({ onAddAsset, closeModal }) {
         <button
           className="add-asset-form__button add-asset-form__button--submit"
           type="submit"
-          onClick={(e) => {
-            e.preventDefault();
-            closeModal();
-          }}
         >
           Add
         </button>
+
         <button
           className="add-asset-form__button add-asset-form__button--cancel"
           type="button"
