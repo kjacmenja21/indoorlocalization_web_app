@@ -1,9 +1,12 @@
+@import "../styles/variables";
+
 .asset-container {
   display: flex;
   align-items: center;
 
   &__header {
     width: 50%;
+    color: $headerTitle;
   }
 
   &__content {

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { IoIosClose } from "react-icons/io";
 import "./_modal.scss";
 
 const Modal = ({ buttonText, title, children }) => {

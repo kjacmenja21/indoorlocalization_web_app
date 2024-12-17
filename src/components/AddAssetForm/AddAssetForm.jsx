@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./_addAssetForm.scss";
-import Modal from "../Modal/Modal";
 
 function AddAssetForm({ onAddAsset, closeModal }) {
   const [newAsset, setNewAsset] = useState({
