@@ -37,10 +37,13 @@ const Modal = ({ buttonText, title, children }) => {
               {/* Modal Title */}
               <div className="details-modal-title">
                 <h1>{title}</h1>
-                <IoIosClose
+                <button id="close" onClick={closeModal}>
+                  close
+                </button>
+                {/* <IoIosClose
                   className="details-modal-close"
                   onClick={closeModal}
-                />
+                /> */}
               </div>
 
               {/* Modal Content */}

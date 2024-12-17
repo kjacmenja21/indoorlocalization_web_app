@@ -63,7 +63,7 @@ function AssetPage() {
   };
 
   return (
-    <div>
+    <div className="asset-page">
       <div className="asset-container">
         <div className="asset-container__header">
           <h2>Asset List</h2>
