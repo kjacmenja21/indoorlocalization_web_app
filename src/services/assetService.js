@@ -86,31 +86,21 @@ export const AssetService = {
        } catch (error) {
            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch assets';
            console.error(`Error fetching assets: ${errorMessage}`);
-       }/*
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return {
-            data: assetList.slice(startIndex, endIndex),
-            total: assetList.length,
-        };*/
+       }
     },
 
-    updateAsset: async (assetId, updatedData) => {
-        /*
-        try{
-            const response = await axiosInstance.put('API_PATHS.ASSETS_PUT/${assetId}', updatedData);
-            return response.data;
+    updateAsset: async (assetId, updatedAsset) => {
+        try {
+            const response = await axiosInstance.put(
+                `${API_PATHS.ASSETS_UPDATE}/${assetId}`,
+                updatedAsset
+            );
+            return response.data; // Successful response
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to update assets';
-            console.error(`Error fetching assets: ${errorMessage}`);
-        }*/
-        const assetIndex = assetList.findIndex(asset => asset.id === assetId);
-        if (assetIndex === -1) {
-            throw new Error(`Asset with ID ${assetId} not found.`);
+            const errorMessage = error.response?.data?.detail || error.message || 'Failed to update asset';
+            console.error(`Error updating asset: ${errorMessage}`);
+            throw new Error(errorMessage); // Re-throw the error for further handling
         }
-        // Merge existing asset with updated data
-        assetList[assetIndex] = { ...assetList[assetIndex], ...updatedData };
-        return assetList[assetIndex];
     },
 
     deleteAsset: async (assetId) => {
@@ -132,26 +122,13 @@ export const AssetService = {
     },
 
     addAsset: async (newAsset) => {
-    try {
-        /*
-                    try {
-                    const response = await axiosInstance.post(`${API_PATHS.ASSETS_POST}`, { asset: newAsset });
-                    return response.data;
-                } catch (error) {
-                    const errorMessage = error.response?.data?.message || error.message || 'Failed to create project';
-                    console.error(`Error creating project for course ${courseId}: ${errorMessage}`);
-                    throw new Error(errorMessage);
-                }*/
-
-            const newId = assetList.length ? Math.max(...assetList.map(asset => asset.id)) + 1 : 1;  // Auto-generate ID
-            const assetWithId = { ...newAsset, id: newId, lastSync: new Date().toISOString() }; // Add ID and lastSync
-            console.log("Lista prije dodavanja:", assetList);
-            assetList.push(assetWithId);
-            console.log("Added asset:", assetWithId);
-            console.log("Lista poslije dodavanja:", assetList);
-            return assetWithId;  // Return the newly added asset */
+        try {
+            const response = await axiosInstance.post(API_PATHS.ASSETS_POST, newAsset);
+            return response.data;
         } catch (error) {
-            console.error("Error adding asset:", error.message);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to add asset';
+            console.error(`Error adding asset: ${errorMessage}`);
+            throw new Error(errorMessage);
         }
     },
 };

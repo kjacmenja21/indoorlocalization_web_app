@@ -41,64 +41,89 @@ let floorMapList = [
 
 export const FloorMapService = {
     getFloorMapById: async (floorMapId) => {
-        /* Simulated backend call
         try {
-            const response = await axiosInstance.get(`${API_PATHS.FLOORMAPS_GET_BY_ID}/${floorMapId}`);
+            const response = await axiosInstance.get(`${API_PATHS.FLOORMAPS_GET_BY_ID}${floorMapId}`);
             return response.data;
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch floor map';
-            console.error(`Error fetching floor map ${floorMapId}: ${errorMessage}`);
+            console.error(`Error fetching floor map by ID (${floorMapId}): ${errorMessage}`);
+            throw new Error(errorMessage);
         }
-        */
-        return floorMapList.find(floorMap => floorMap.id === floorMapId);
+    },
+
+    getFloorMapName: async (floorMapId) => {
+        try {
+            const floorMap = await this.getFloorMapById(floorMapId);
+            return floorMap.name;
+        } catch (error) {
+            console.error(`Error fetching floor map name: ${error.message}`);
+            return "Unknown Floor";
+        }
     },
 
     getAllFloorMaps: async () => {
-        /* Simulated backend call
         try {
-            const response = await axiosInstance.get(API_PATHS.FLOORMAPS_GET_ALL);
-            return response.data;
+            // Fetch the first page to get total_pages
+            const firstResponse = await axiosInstance.get(API_PATHS.FLOORMAPS_GET_ALL, {
+                params: { page: 1, limit: 10 },
+            });
+
+            const { total_pages } = firstResponse.data;
+            let allFloorMaps = [...firstResponse.data.page];
+
+            if (total_pages > 1) {
+                const pageRequests = [];
+                for (let page = 2; page <= total_pages; page++) {
+                    pageRequests.push(
+                        axiosInstance.get(API_PATHS.FLOORMAPS_GET_ALL, {
+                            params: { page, limit: 10 },
+                        })
+                    );
+                }
+
+                const otherPages = await Promise.all(pageRequests);
+
+                otherPages.forEach((response) => {
+                    allFloorMaps = [...allFloorMaps, ...response.data.page];
+                });
+            }
+
+            return allFloorMaps;
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch floor maps';
-            console.error(`Error fetching floor maps: ${errorMessage}`);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to fetch floormaps";
+            console.error(`Error fetching floormaps: ${errorMessage}`);
+            throw new Error(errorMessage);
         }
-        */
-        return floorMapList;
     },
 
-    updateFloorMap: async (floorMapId, updatedData) => {
-        /* Simulated backend call
+    addFloorMap: async (newFloorMapData, imageFile) => {
         try {
-            const response = await axiosInstance.put(`${API_PATHS.FLOORMAPS_PUT}/${floorMapId}`, updatedData);
+            const formData = new FormData();
+            formData.append("image", imageFile); // Append the image
+            formData.append("floormap_data", JSON.stringify(newFloorMapData)); // Append the floor map data
+
+            const response = await axiosInstance.post(API_PATHS.FLOORMAPS_POST, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
             return response.data;
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to update floor map';
-            console.error(`Error updating floor map: ${errorMessage}`);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to add floor map";
+            console.error(`Error adding floor map: ${errorMessage}`);
+            throw new Error(errorMessage);
         }
-        */
-        const floorMapIndex = floorMapList.findIndex(floorMap => floorMap.id === floorMapId);
-        if (floorMapIndex === -1) {
-            throw new Error(`Floor map with ID ${floorMapId} not found.`);
-        }
-        floorMapList[floorMapIndex] = { ...floorMapList[floorMapIndex], ...updatedData };
-        return floorMapList[floorMapIndex];
     },
+
 
     deleteFloorMap: async (floorMapId) => {
-        /* Simulated backend call
         try {
-            const response = await axiosInstance.delete(`${API_PATHS.FLOORMAPS_DELETE}/${floorMapId}`);
+            const response = await axiosInstance.delete(`floormaps/${floorMapId}`);
             return response.data;
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete floor map';
-            console.error(`Error deleting floor map: ${errorMessage}`);
+            console.error("Error deleting floor map:", error.message);
+            throw new Error("Failed to delete floor map");
         }
-        */
-        const floorMapIndex = floorMapList.findIndex(floorMap => floorMap.id === floorMapId);
-        if (floorMapIndex === -1) {
-            throw new Error(`Floor map with ID ${floorMapId} not found.`);
-        }
-        const deletedFloorMap = floorMapList.splice(floorMapIndex, 1)[0];
-        return deletedFloorMap;
     },
 };
