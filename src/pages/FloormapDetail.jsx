@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
+import {FloorMapService} from "../services/floormapService.js";
 
 function FloormapDetail() {
     const { floormapId } = useParams();
