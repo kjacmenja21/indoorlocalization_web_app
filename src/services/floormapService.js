@@ -96,26 +96,26 @@ export const FloorMapService = {
         }
     },
 
-
-
-
-    updateFloorMap: async (floorMapId, updatedData) => {
-        /* Simulated backend call
+    addFloorMap: async (newFloorMapData, imageFile) => {
         try {
-            const response = await axiosInstance.put(`${API_PATHS.FLOORMAPS_PUT}/${floorMapId}`, updatedData);
+            const formData = new FormData();
+            formData.append("image", imageFile); // Append the image
+            formData.append("floormap_data", JSON.stringify(newFloorMapData)); // Append the floor map data
+
+            const response = await axiosInstance.post(API_PATHS.FLOORMAPS_POST, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
             return response.data;
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to update floor map';
-            console.error(`Error updating floor map: ${errorMessage}`);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to add floor map";
+            console.error(`Error adding floor map: ${errorMessage}`);
+            throw new Error(errorMessage);
         }
-        */
-        const floorMapIndex = floorMapList.findIndex(floorMap => floorMap.id === floorMapId);
-        if (floorMapIndex === -1) {
-            throw new Error(`Floor map with ID ${floorMapId} not found.`);
-        }
-        floorMapList[floorMapIndex] = { ...floorMapList[floorMapIndex], ...updatedData };
-        return floorMapList[floorMapIndex];
     },
+
 
     deleteFloorMap: async (floorMapId) => {
         /* Simulated backend call
