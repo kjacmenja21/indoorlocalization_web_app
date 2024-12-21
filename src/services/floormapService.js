@@ -118,20 +118,12 @@ export const FloorMapService = {
 
 
     deleteFloorMap: async (floorMapId) => {
-        /* Simulated backend call
         try {
-            const response = await axiosInstance.delete(`${API_PATHS.FLOORMAPS_DELETE}/${floorMapId}`);
+            const response = await axiosInstance.delete(`floormaps/${floorMapId}`);
             return response.data;
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete floor map';
-            console.error(`Error deleting floor map: ${errorMessage}`);
+            console.error("Error deleting floor map:", error.message);
+            throw new Error("Failed to delete floor map");
         }
-        */
-        const floorMapIndex = floorMapList.findIndex(floorMap => floorMap.id === floorMapId);
-        if (floorMapIndex === -1) {
-            throw new Error(`Floor map with ID ${floorMapId} not found.`);
-        }
-        const deletedFloorMap = floorMapList.splice(floorMapIndex, 1)[0];
-        return deletedFloorMap;
     },
 };

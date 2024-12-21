@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 function FloormapDetail() {
     const { floormapId } = useParams();
+    const navigate = useNavigate();
     const [assets, setAssets] = useState([]);
     const floormapWidth = 500; // Image width
     const floormapHeight = 300; // Image height
@@ -65,6 +66,21 @@ function FloormapDetail() {
         return () => clearInterval(intervalId);
     }, [floormapId]);
 
+    const handleDeleteClick = async () => {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this floor map?"
+        );
+        if (confirmed) {
+            try {
+                await FloorMapService.deleteFloorMap(floormapId);
+                alert("Floor map deleted successfully!");
+                navigate("/home");  // Navigate to the HomePage after deletion
+            } catch (error) {
+                alert("Failed to delete floor map. Please try again.");
+            }
+        }
+    };
+
     return (
         <div>
             <h2>Floormap Detail for {floormapId}</h2>
@@ -97,6 +113,7 @@ function FloormapDetail() {
                     ></div>
                 ))}
             </div>
+            <button onClick={handleDeleteClick}>Delete Floor Map</button>
         </div>
     );
 }
