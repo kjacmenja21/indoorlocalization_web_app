@@ -80,9 +80,6 @@ function AssetPage() {
           (currentPage - 1) * itemsPerPage,
           currentPage * itemsPerPage
         )}
-        onNavigate={(asset) =>
-          navigate(`/assets/${asset.id}`, { state: { asset } })
-        }
       />
 
       <Pagination

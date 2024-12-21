@@ -1,8 +1,9 @@
 import React from "react";
 import { FaInfoCircle } from "react-icons/fa";
 import "./_assetTable.scss";
+import {useNavigate} from "react-router-dom";
 
-const AssetTable = ({ assets, onNavigate }) => {
+const AssetTable = ({ assets }) => {
   const styles = {
     iconButton: {
       background: "none",
@@ -11,6 +12,7 @@ const AssetTable = ({ assets, onNavigate }) => {
       fontSize: "16px",
     },
   };
+  const navigate = useNavigate();
 
   return (
     <>
@@ -86,7 +88,8 @@ const AssetTable = ({ assets, onNavigate }) => {
               >
                 <button
                   style={styles.iconButton}
-                  onClick={() => onNavigate(asset.id)}
+                  onClick={() => navigate(`/assets/${asset.id}`, { state: { asset } })
+                  }
                 >
                   <FaInfoCircle size={23} />
                 </button>
