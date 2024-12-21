@@ -122,26 +122,13 @@ export const AssetService = {
     },
 
     addAsset: async (newAsset) => {
-    try {
-        /*
-                    try {
-                    const response = await axiosInstance.post(`${API_PATHS.ASSETS_POST}`, { asset: newAsset });
-                    return response.data;
-                } catch (error) {
-                    const errorMessage = error.response?.data?.message || error.message || 'Failed to create project';
-                    console.error(`Error creating project for course ${courseId}: ${errorMessage}`);
-                    throw new Error(errorMessage);
-                }*/
-
-            const newId = assetList.length ? Math.max(...assetList.map(asset => asset.id)) + 1 : 1;  // Auto-generate ID
-            const assetWithId = { ...newAsset, id: newId, lastSync: new Date().toISOString() }; // Add ID and lastSync
-            console.log("Lista prije dodavanja:", assetList);
-            assetList.push(assetWithId);
-            console.log("Added asset:", assetWithId);
-            console.log("Lista poslije dodavanja:", assetList);
-            return assetWithId;  // Return the newly added asset */
+        try {
+            const response = await axiosInstance.post(API_PATHS.ASSETS_POST, newAsset);
+            return response.data;
         } catch (error) {
-            console.error("Error adding asset:", error.message);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to add asset';
+            console.error(`Error adding asset: ${errorMessage}`);
+            throw new Error(errorMessage);
         }
     },
 };

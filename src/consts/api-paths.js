@@ -11,7 +11,7 @@ export const API_PATHS = {
   ASSETS_POST: "assets/",
 
   /* FLOORMAPS */
-  FLOORMAPS_GET_ALL: "floormaps/get/all/",
+  FLOORMAPS_GET_ALL: "floor-maps/",
   FLOORMAPS_GET_BY_ID: "floor-maps/",
   FLOORMAPS_PUT: "floormaps/put/",
   FLOORMAPS_DELETE: "floormaps/delete/",

@@ -62,17 +62,42 @@ export const FloorMapService = {
     },
 
     getAllFloorMaps: async () => {
-        /* Simulated backend call
         try {
-            const response = await axiosInstance.get(API_PATHS.FLOORMAPS_GET_ALL);
-            return response.data;
+            // Fetch the first page to get total_pages
+            const firstResponse = await axiosInstance.get(API_PATHS.FLOORMAPS_GET_ALL, {
+                params: { page: 1, limit: 10 },
+            });
+
+            const { total_pages } = firstResponse.data;
+            let allFloorMaps = [...firstResponse.data.page];
+
+            if (total_pages > 1) {
+                const pageRequests = [];
+                for (let page = 2; page <= total_pages; page++) {
+                    pageRequests.push(
+                        axiosInstance.get(API_PATHS.FLOORMAPS_GET_ALL, {
+                            params: { page, limit: 10 },
+                        })
+                    );
+                }
+
+                const otherPages = await Promise.all(pageRequests);
+
+                otherPages.forEach((response) => {
+                    allFloorMaps = [...allFloorMaps, ...response.data.page];
+                });
+            }
+
+            return allFloorMaps;
         } catch (error) {
-            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch floor maps';
-            console.error(`Error fetching floor maps: ${errorMessage}`);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to fetch floormaps";
+            console.error(`Error fetching floormaps: ${errorMessage}`);
+            throw new Error(errorMessage);
         }
-        */
-        return floorMapList;
     },
+
+
+
 
     updateFloorMap: async (floorMapId, updatedData) => {
         /* Simulated backend call
