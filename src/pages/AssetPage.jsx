@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { AssetService } from "../services/assetService.js";
 import AssetTable from "../components/AssetTable/AssetTable.jsx";
 import AddAssetForm from "../components/AddAssetForm/AddAssetForm.jsx";
+import Modal from "../components/Modal/Modal.jsx";
+import Pagination from "../components/Pagination/Pagination.jsx";
+import "./_pages.scss";
 
 function AssetPage() {
   const [assets, setAssets] = useState([]);
-  const [totalAssets, setTotalAssets] = useState(0); // Track total assets
+  const [totalAssets, setTotalAssets] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
@@ -17,10 +20,8 @@ function AssetPage() {
   useEffect(() => {
     const fetchPaginatedAssets = async () => {
       try {
-        const { current_page, total_pages, page_limit, page } = await AssetService.getPaginatedAssets(
-          currentPage,
-          itemsPerPage
-        );
+        const { current_page, total_pages, page_limit, page } =
+          await AssetService.getPaginatedAssets(currentPage, itemsPerPage);
         setAssets(page);
         setTotalAssets(page_limit);
       } catch (error) {
@@ -62,51 +63,33 @@ function AssetPage() {
   };
 
   return (
-    <div>
-      <h2>Asset List</h2>
-      <button
-        style={{ marginBottom: "10px", padding: "10px", fontSize: "16px" }}
-        onClick={() => setShowAddForm(true)}
-      >
-        Add Asset
-      </button>
-      {showAddForm && (
-        <AddAssetForm
-          onAddAsset={handleAddAsset}
-          onCancel={() => setShowAddForm(false)}
-        />
-      )}
+    <div className="asset-page">
+      <div className="asset-container">
+        <div className="asset-container__header">
+          <h2>Asset List</h2>
+        </div>
+        <div className="asset-container__content">
+          <Modal buttonText="Add asset" title="Add new asset">
+            <AddAssetForm onAddAsset={handleAddAsset} />
+          </Modal>
+        </div>
+      </div>
+
       <AssetTable
         assets={assets.slice(
           (currentPage - 1) * itemsPerPage,
           currentPage * itemsPerPage
         )}
-        onNavigate={(asset) => navigate(`/assets/${asset.id}`, { state: { asset } })}
+        onNavigate={(asset) =>
+          navigate(`/assets/${asset.id}`, { state: { asset } })
+        }
       />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "20px",
-        }}
-      >
-        <button
-          onClick={() => handlePageChange("prev")}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          onClick={() => handlePageChange("next")}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
-      </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 }

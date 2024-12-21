@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./_addAssetForm.scss";
 
-function AddAssetForm({ onAddAsset, onCancel }) {
+function AddAssetForm({ onAddAsset, closeModal }) {
   const [newAsset, setNewAsset] = useState({
     name: "",
     x: 0,
@@ -11,14 +11,13 @@ function AddAssetForm({ onAddAsset, onCancel }) {
 
   const handleAddAsset = (e) => {
     e.preventDefault();
-    onAddAsset(newAsset);
-    setNewAsset({ name: "", x: 0, y: 0, floorMapName: "" });
+    onAddAsset(newAsset); // Submit the asset
+    closeModal(); // Close the modal after submission
+    setNewAsset({ name: "", x: 0, y: 0, floorMapName: "" }); // Reset the form
   };
 
   return (
     <form className="add-asset-form" onSubmit={handleAddAsset}>
-      <h3 className="add-asset-form__title">Add New Asset</h3>
-
       <div className="add-asset-form__input-group">
         <input
           id="name"
@@ -92,10 +91,14 @@ function AddAssetForm({ onAddAsset, onCancel }) {
         >
           Add
         </button>
+
         <button
           className="add-asset-form__button add-asset-form__button--cancel"
           type="button"
-          onClick={onCancel}
+          onClick={(e) => {
+            e.preventDefault();
+            closeModal();
+          }}
         >
           Cancel
         </button>
