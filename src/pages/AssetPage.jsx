@@ -6,6 +6,8 @@ import AddAssetForm from "../components/AddAssetForm/AddAssetForm.jsx";
 import Modal from "../components/Modal/Modal.jsx";
 import Pagination from "../components/Pagination/Pagination.jsx";
 import "./_pages.scss";
+import {AssetPropType} from "../core/types/assetPropType.js";
+import {FloorMapService} from "../services/floormapService.js";
 
 function AssetPage() {
   const [assets, setAssets] = useState([]);
@@ -18,18 +20,31 @@ function AssetPage() {
 
   // Fetch assets on component mount
   useEffect(() => {
-    const fetchPaginatedAssets = async () => {
+    const fetchAssetsWithFloorMapNames = async () => {
       try {
-        const { current_page, total_pages, page_limit, page } =
-          await AssetService.getPaginatedAssets(currentPage, itemsPerPage);
-        setAssets(page);
+        const { page, page_limit } = await AssetService.getPaginatedAssets(currentPage, itemsPerPage);
+        const floorMapIds = [...new Set(page.map((asset) => asset.floormap_id))];
+        const floorMapPromises = floorMapIds.map((id) => FloorMapService.getFloorMapById(id));
+        const floorMaps = await Promise.all(floorMapPromises);
+
+        const floorMapIdToName = floorMaps.reduce((acc, floorMap) => {
+          acc[floorMap.id] = floorMap.name;
+          return acc;
+        }, {});
+
+        const assetsWithNames = page.map((asset) => ({
+          ...asset,
+          floorMapName: floorMapIdToName[asset.floormap_id] || "Unknown Floor",
+        }));
+
+        setAssets(assetsWithNames);
         setTotalAssets(page_limit);
       } catch (error) {
-        console.error("Error fetching paginated assets:", error.message);
+        console.error("Error fetching assets or floor maps:", error.message);
       }
     };
 
-    fetchPaginatedAssets();
+    fetchAssetsWithFloorMapNames();
   }, [currentPage]);
 
   // Pagination logic
@@ -43,52 +58,37 @@ function AssetPage() {
     }
   };
 
-  // Add new asset
-  const handleAddAsset = async (newAsset) => {
-    try {
-      const newId = assets.length
-        ? Math.max(...assets.map((a) => a.id)) + 1
-        : 1;
-      const assetToAdd = {
-        ...newAsset,
-        id: newId,
-        lastSync: new Date().toISOString(),
-      };
-      const updatedAsset = await AssetService.addAsset(assetToAdd);
-      setAssets([...assets, updatedAsset]);
-      setShowAddForm(false);
-    } catch (error) {
-      console.error("Error adding asset:", error.message);
-    }
-  };
-
   return (
-    <div className="asset-page">
-      <div className="asset-container">
-        <div className="asset-container__header">
-          <h2>Asset List</h2>
+      <div className="asset-page">
+        <div className="asset-container">
+          <div className="asset-container__header">
+            <h2>Asset List</h2>
+          </div>
+          <div className="asset-container__content">
+            <Modal buttonText="Add asset" title="Add new asset">
+              <AddAssetForm />
+            </Modal>
+          </div>
         </div>
-        <div className="asset-container__content">
-          <Modal buttonText="Add asset" title="Add new asset">
-            <AddAssetForm onAddAsset={handleAddAsset} />
-          </Modal>
-        </div>
+
+        <AssetTable
+            assets={assets.slice(
+                (currentPage - 1) * itemsPerPage,
+                currentPage * itemsPerPage
+            )}
+        />
+
+        <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+        />
       </div>
-
-      <AssetTable
-        assets={assets.slice(
-          (currentPage - 1) * itemsPerPage,
-          currentPage * itemsPerPage
-        )}
-      />
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
-    </div>
   );
 }
+
+AssetPage.propTypes = {
+  assets: AssetPropType,
+};
 
 export default AssetPage;

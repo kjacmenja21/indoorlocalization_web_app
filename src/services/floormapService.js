@@ -41,16 +41,24 @@ let floorMapList = [
 
 export const FloorMapService = {
     getFloorMapById: async (floorMapId) => {
-        /* Simulated backend call
         try {
-            const response = await axiosInstance.get(`${API_PATHS.FLOORMAPS_GET_BY_ID}/${floorMapId}`);
+            const response = await axiosInstance.get(`${API_PATHS.FLOORMAPS_GET_BY_ID}${floorMapId}`);
             return response.data;
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch floor map';
-            console.error(`Error fetching floor map ${floorMapId}: ${errorMessage}`);
+            console.error(`Error fetching floor map by ID (${floorMapId}): ${errorMessage}`);
+            throw new Error(errorMessage);
         }
-        */
-        return floorMapList.find(floorMap => floorMap.id === floorMapId);
+    },
+
+    getFloorMapName: async (floorMapId) => {
+        try {
+            const floorMap = await this.getFloorMapById(floorMapId);
+            return floorMap.name;
+        } catch (error) {
+            console.error(`Error fetching floor map name: ${error.message}`);
+            return "Unknown Floor";
+        }
     },
 
     getAllFloorMaps: async () => {

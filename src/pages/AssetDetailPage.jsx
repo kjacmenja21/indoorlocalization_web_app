@@ -1,11 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
+import {AssetPropType} from "../core/types/assetPropType.js";
 
 function AssetDetailPage() {
   const { state } = useLocation();
   const asset = state?.asset;
-
   return (
       <div>
         <h2>Asset Details</h2>
@@ -24,11 +24,10 @@ function AssetDetailPage() {
                 <strong>Y:</strong> {asset.y}
               </p>
               <p>
-                <strong>Last Sync:</strong>{" "}
-                {new Date(asset.last_sync).toLocaleString()}
+                <strong>Last Sync:</strong> {new Date(asset.last_sync).toLocaleString()}
               </p>
               <p>
-                <strong>Floor Map Name:</strong> {asset.floormap_id}
+                <strong>Floor Map Name:</strong> {asset.floorMapName}
               </p>
             </div>
         ) : (
@@ -41,15 +40,7 @@ function AssetDetailPage() {
 AssetDetailPage.propTypes = {
   location: PropTypes.shape({
     state: PropTypes.shape({
-      asset: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        active: PropTypes.bool.isRequired,
-        floormap_id: PropTypes.number.isRequired,
-        id: PropTypes.number.isRequired,
-        x: PropTypes.number.isRequired,
-        y: PropTypes.number.isRequired,
-        last_sync: PropTypes.string.isRequired,
-      }),
+      asset: AssetPropType,
     }),
   }),
 };
