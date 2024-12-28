@@ -6,15 +6,15 @@ import AddAssetForm from "../components/AddAssetForm/AddAssetForm.jsx";
 import Modal from "../components/Modal/Modal.jsx";
 import Pagination from "../components/Pagination/Pagination.jsx";
 import "./_pages.scss";
-import {AssetPropType} from "../core/types/assetPropType.js";
-import {FloorMapService} from "../services/floormapService.js";
+import { AssetPropType } from "../core/types/assetPropType.js";
+import { FloorMapService } from "../services/floormapService.js";
 
 function AssetPage() {
   const [assets, setAssets] = useState([]);
   const [totalAssets, setTotalAssets] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const navigate = useNavigate();
+  // const [showAddForm, setShowAddForm] = useState(false);
+  // const navigate = useNavigate();
 
   const itemsPerPage = 5;
 
@@ -22,9 +22,16 @@ function AssetPage() {
   useEffect(() => {
     const fetchAssetsWithFloorMapNames = async () => {
       try {
-        const { page, page_limit } = await AssetService.getPaginatedAssets(currentPage, itemsPerPage);
-        const floorMapIds = [...new Set(page.map((asset) => asset.floormap_id))];
-        const floorMapPromises = floorMapIds.map((id) => FloorMapService.getFloorMapById(id));
+        const { page, page_limit } = await AssetService.getPaginatedAssets(
+          currentPage,
+          itemsPerPage
+        );
+        const floorMapIds = [
+          ...new Set(page.map((asset) => asset.floormap_id)),
+        ];
+        const floorMapPromises = floorMapIds.map((id) =>
+          FloorMapService.getFloorMapById(id)
+        );
         const floorMaps = await Promise.all(floorMapPromises);
 
         const floorMapIdToName = floorMaps.reduce((acc, floorMap) => {
@@ -59,31 +66,31 @@ function AssetPage() {
   };
 
   return (
-      <div className="asset-page">
-        <div className="asset-container">
-          <div className="asset-container__header">
-            <h2>Asset List</h2>
-          </div>
-          <div className="asset-container__content">
-            <Modal buttonText="Add asset" title="Add new asset">
-              <AddAssetForm />
-            </Modal>
-          </div>
+    <div className="asset-page">
+      <div className="asset-container">
+        <div className="asset-container__header">
+          <h2>Asset List</h2>
         </div>
-
-        <AssetTable
-            assets={assets.slice(
-                (currentPage - 1) * itemsPerPage,
-                currentPage * itemsPerPage
-            )}
-        />
-
-        <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-        />
+        <div className="asset-container__content">
+          <Modal buttonText="Add asset" title="Add new asset">
+            <AddAssetForm />
+          </Modal>
+        </div>
       </div>
+
+      <AssetTable
+        assets={assets.slice(
+          (currentPage - 1) * itemsPerPage,
+          currentPage * itemsPerPage
+        )}
+      />
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+    </div>
   );
 }
 

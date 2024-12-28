@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Login from "../components/Login/Login";
 import { AuthService } from "../services/auth/authService";
-import {FloorMapService} from "../services/floormapService.js";
+import { FloorMapService } from "../services/floormapService.js";
 import AddFloormapForm from "../components/AddFloormapForm/AddFloormapForm.jsx";
+import Modal from "../components/Modal/Modal.jsx";
 
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [floormaps, setFloormaps] = useState([]);
-  const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,52 +34,46 @@ function HomePage() {
     navigate(`/floormap/${floormapId}`);
   };
 
-  const toggleAddForm = () => {
-    setShowAddForm(!showAddForm);
-  };
-
   return (
-      <div className="home-page">
-        {!isAuthenticated ? (
-            <Login />
-        ) : (
-            <div>
-              <h2>Floor Maps</h2>
-              <button className="add-floormap-btn" onClick={toggleAddForm}>
-                Add New Floor Map
-              </button>
+    <div className="home-page">
+      {!isAuthenticated ? (
+        <Login />
+      ) : (
+        <div>
+          <h2>Floor Maps</h2>
+          <Modal buttonText="Add New Floor Map" title="Add New Floor Map">
+            <AddFloormapForm />
+          </Modal>
 
-              {showAddForm && <AddFloormapForm closeForm={toggleAddForm} />}
-
-              <div className="floormap-grid">
-                {floormaps.length > 0 ? (
-                    floormaps.map((floormap) => (
-                        <div
-                            key={floormap.id}
-                            className="floormap-item"
-                            onClick={() => handleFloormapClick(floormap.id)}
-                        >
-                          <img
-                              src={floormap.image}
-                              alt={floormap.name}
-                              className="floormap-image"
-                          />
-                          <p>{floormap.name}</p>
-                          <button
-                              className="floormap-button"
-                              onClick={() => handleFloormapClick(floormap.id)}
-                          >
-                            View Details
-                          </button>
-                        </div>
-                    ))
-                ) : (
-                    <p>No floor maps available.</p>
-                )}
-              </div>
-            </div>
-        )}
-      </div>
+          <div className="floormap-grid">
+            {floormaps.length > 0 ? (
+              floormaps.map((floormap) => (
+                <div
+                  key={floormap.id}
+                  className="floormap-item"
+                  onClick={() => handleFloormapClick(floormap.id)}
+                >
+                  <img
+                    src={floormap.image}
+                    alt={floormap.name}
+                    className="floormap-image"
+                  />
+                  <p>{floormap.name}</p>
+                  <button
+                    className="floormap-button"
+                    onClick={() => handleFloormapClick(floormap.id)}
+                  >
+                    View Details
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p>No floor maps available.</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
