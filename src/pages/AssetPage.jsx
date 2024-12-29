@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { AssetService } from "../services/assetService.js";
 import AssetTable from "../components/AssetTable/AssetTable.jsx";
 import AddAssetForm from "../components/AddAssetForm/AddAssetForm.jsx";
@@ -13,8 +12,6 @@ function AssetPage() {
   const [assets, setAssets] = useState([]);
   const [totalAssets, setTotalAssets] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  // const [showAddForm, setShowAddForm] = useState(false);
-  // const navigate = useNavigate();
 
   const itemsPerPage = 5;
 
