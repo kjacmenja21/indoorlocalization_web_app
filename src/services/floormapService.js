@@ -65,7 +65,7 @@ export const FloorMapService = {
         try {
             // Fetch the first page to get total_pages
             const firstResponse = await axiosInstance.get(API_PATHS.FLOORMAPS_GET_ALL, {
-                params: { page: 1, limit: 10 },
+                params: { page: 0, limit: 10 },
             });
 
             const { total_pages } = firstResponse.data;
@@ -100,7 +100,7 @@ export const FloorMapService = {
         try {
             const formData = new FormData();
             formData.append("image", imageFile); // Append the image
-            formData.append("floormap_data", JSON.stringify(newFloorMapData)); // Append the floor map data
+            formData.append("data", JSON.stringify(newFloorMapData)); // Append the floor map data
 
             const response = await axiosInstance.post(API_PATHS.FLOORMAPS_POST, formData, {
                 headers: {
