@@ -16,7 +16,7 @@ function ZoneEditing() {
     const [isDrawing, setIsDrawing] = useState(false);
     const [zoneName, setZoneName] = useState("");
     const [zoneNameError, setZoneNameError] = useState(false);
-    const [isFinishedDrawing, setIsFinishedDrawing] = useState(false); // New state to track drawing completion
+    const [isFinishedDrawing, setIsFinishedDrawing] = useState(false);
     const containerRef = useRef();
 
     useEffect(() => {
@@ -70,8 +70,8 @@ function ZoneEditing() {
                 color: Math.floor(Math.random() * 16777215).toString(16),
             });
         } else if (!isDrawing && newZone) {
-            setIsDrawing(false); // Finish drawing after second click
-            setIsFinishedDrawing(true); // Mark drawing as finished
+            setIsDrawing(false);
+            setIsFinishedDrawing(true);
         }
     };
 
@@ -89,28 +89,36 @@ function ZoneEditing() {
 
     const handleMouseUp = () => {
         if (isDrawing && newZone) {
-            setIsDrawing(false); // Finish drawing after mouse up
-            setIsFinishedDrawing(true); // Mark drawing as finished
+            setIsDrawing(false);
+            setIsFinishedDrawing(true);
         }
     };
 
     const handleZoneNameChange = (name) => {
         setZoneName(name);
-        setZoneNameError(false); // Reset error if the user starts typing
+        setZoneNameError(false);
     };
 
     const handleSubmitZone = () => {
         if (!zoneName) {
-            setZoneNameError(true); // Error if zone name is not entered
+            setZoneNameError(true);
             return;
         }
-        setZones([...zones, { ...newZone, name: zoneName }]);
+        const updatedZones = [...zones, { ...newZone, name: zoneName }];
+        setZones(updatedZones);
         setNewZone(null);
         setZoneName("");
-        setZoneNameError(false); // Reset error state
-        setIsFinishedDrawing(false); // Reset drawing state after submission
-        setIsDrawing(false); // Reset drawing state after submission
+        setZoneNameError(false);
+        setIsFinishedDrawing(false);
+        setIsDrawing(false);
         console.log("Zone submitted:", { ...newZone, name: zoneName });
+    };
+
+    // Handle undo for the ongoing drawing
+    const handleUndo = () => {
+        if (newZone) {
+            setNewZone(null); // Clear the current drawing
+        }
     };
 
     return (
@@ -132,10 +140,11 @@ function ZoneEditing() {
                     isDrawing={isDrawing}
                     setIsDrawing={setIsDrawing}
                     zoneName={zoneName}
-                    zoneNameError={zoneNameError} // Pass error state to ZoneMenu
+                    zoneNameError={zoneNameError}
                     onZoneNameChange={handleZoneNameChange}
                     onSubmitZone={handleSubmitZone}
-                    isFinishedDrawing={isFinishedDrawing} // Pass the drawing completion state
+                    isFinishedDrawing={isFinishedDrawing}
+                    onUndo={handleUndo}
                 />
             </div>
         </div>

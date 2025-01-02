@@ -1,6 +1,15 @@
 import React from "react";
 
-const ZoneMenu = ({ isDrawing, setIsDrawing, zoneName, zoneNameError, onZoneNameChange, onSubmitZone, isFinishedDrawing }) => (
+const ZoneMenu = ({
+                      isDrawing,
+                      setIsDrawing,
+                      zoneName,
+                      zoneNameError,
+                      onZoneNameChange,
+                      onSubmitZone,
+                      isFinishedDrawing,
+                      onUndo
+                  }) => (
     <div className="zone-menu">
         <h3>Zone Options</h3>
         <button onClick={() => setIsDrawing(!isDrawing)} disabled={!!zoneName && isDrawing}>
@@ -22,6 +31,7 @@ const ZoneMenu = ({ isDrawing, setIsDrawing, zoneName, zoneNameError, onZoneName
                 <button onClick={onSubmitZone}>Submit Zone</button>
             </div>
         )}
+        <button onClick={onUndo} disabled={isDrawing}>Undo</button> {/* Undo Button */}
     </div>
 );
 
