@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {FloorMapService} from "../services/floormapService.js";
 
 function FloormapDetail() {
@@ -115,6 +115,9 @@ function FloormapDetail() {
                 ))}
             </div>
             <button onClick={handleDeleteClick}>Delete Floor Map</button>
+            <Link to={`/zone-editing/${floormapId}`} style={{ marginLeft: "10px" }}>
+                <button>Edit Zones</button>
+            </Link>
         </div>
     );
 }
