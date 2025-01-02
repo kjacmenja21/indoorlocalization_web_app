@@ -1,7 +1,8 @@
-import React, {useEffect, useRef, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {FloorMapService} from "../services/floormapService.js";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { FloorMapService } from "../services/floormapService.js";
 import { Stage, Layer, Rect } from "react-konva";
+import "./_pages.scss";
 
 function ZoneEditing() {
     const { floormapId } = useParams();
@@ -10,7 +11,8 @@ function ZoneEditing() {
     const [zones, setZones] = useState([]);
     const [newZone, setNewZone] = useState(null);
     const stageRef = useRef();
-
+    const containerRef = useRef(); // Reference for parent container
+    const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
 
     useEffect(() => {
         FloorMapService.getFloorMapById(floormapId)
@@ -22,6 +24,33 @@ function ZoneEditing() {
                 console.error(`Error fetching floormap details for ID ${floormapId}:`, error);
             });
     }, [floormapId]);
+
+    useEffect(() => {
+        // Dynamically adjust the stage size based on container size
+        const updateStageSize = () => {
+            if (containerRef.current) {
+                const containerWidth = containerRef.current.offsetWidth;
+                const containerHeight = containerRef.current.offsetHeight;
+
+                // Scale the stage proportionally
+                const stageWidth = floormap.width || 3000;
+                const stageHeight = floormap.height || 2000;
+                const scaleFactor = Math.min(
+                    containerWidth / stageWidth,
+                    containerHeight / stageHeight
+                );
+
+                setStageSize({
+                    width: stageWidth * scaleFactor,
+                    height: stageHeight * scaleFactor,
+                });
+            }
+        };
+
+        updateStageSize();
+        window.addEventListener("resize", updateStageSize); // Update size on window resize
+        return () => window.removeEventListener("resize", updateStageSize);
+    }, [floormap]);
 
     const handleMouseDown = (e) => {
         const stage = stageRef.current.getStage();
@@ -42,9 +71,8 @@ function ZoneEditing() {
         const stage = stageRef.current.getStage();
         const pointer = stage.getPointerPosition();
 
-        // Ensure the rectangle stays within the boundaries
-        const maxWidth = floormap.width;
-        const maxHeight = floormap.height;
+        const maxWidth = stageSize.width;
+        const maxHeight = stageSize.height;
 
         setNewZone((zone) => ({
             ...zone,
@@ -61,17 +89,18 @@ function ZoneEditing() {
     };
 
     return (
-        <div>
+        <div className="zone-editing">
             <h2>Floormap Detail for {floormapId}</h2>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div className="stage-container" ref={containerRef}>
                 <Stage
                     ref={stageRef}
-                    width={floormap.width || 800}
-                    height={floormap.height || 600}
+                    className="konva-stage"
+                    width={stageSize.width}
+                    height={stageSize.height}
                     style={{
-                        border: "1px solid black",
                         backgroundImage: `url(${floormap.imageUrl || "/mnt/data/image.png"})`,
-                        backgroundSize: "cover",
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat",
                         backgroundPosition: "center",
                     }}
                     onMouseDown={handleMouseDown}
@@ -106,7 +135,6 @@ function ZoneEditing() {
                     onClick={() => {
                         console.log("Zones to submit:", zones);
                     }}
-                    style={{ marginTop: 20 }}
                 >
                     Submit Zones
                 </button>
