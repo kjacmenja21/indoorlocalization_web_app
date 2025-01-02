@@ -112,6 +112,8 @@ function ZoneEditing() {
         setIsFinishedDrawing(false);
         setIsDrawing(false);
         console.log("Zone submitted:", { ...newZone, name: zoneName });
+        console.log("Zone after convertion:", convertZoneData({ ...newZone, name: zoneName }, floormapId));
+
     };
 
     // Handle undo for the ongoing drawing
@@ -119,6 +121,44 @@ function ZoneEditing() {
         if (newZone) {
             setNewZone(null); // Clear the current drawing
         }
+    };
+
+    const convertZoneData = (zoneData, floorMapId) => {
+        const { name, color, x, y, width, height } = zoneData;
+
+        const points = [
+            { ordinalNumber: 0, x, y }, // Top-left corner
+            { ordinalNumber: 1, x: x + width, y }, // Top-right corner
+            { ordinalNumber: 2, x, y: y + height }, // Bottom-left corner
+        ];
+
+        return {
+            name,
+            floorMapId,
+            color: parseInt(color.replace('#', ''), 16),
+            points,
+        };
+    };
+
+    const convertBackendZoneData = (backendZoneData) => {
+        const { name, color, points } = backendZoneData;
+
+        // Extract the points from the backend data
+        const [topLeft, topRight, bottomLeft] = points;
+
+        // Calculate width and height
+        const width = topRight.x - topLeft.x;
+        const height = bottomLeft.y - topLeft.y;
+
+        // Return the zone data in the format you can use for drawing
+        return {
+            name,
+            color: `#${color.toString(16).padStart(6, '0')}`, // Convert color back to hex
+            x: topLeft.x,
+            y: topLeft.y,
+            width,
+            height,
+        };
     };
 
     return (
