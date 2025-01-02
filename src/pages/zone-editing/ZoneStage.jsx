@@ -1,21 +1,10 @@
 import React from "react";
-import { Stage, Layer, Rect } from "react-konva";
+import { Layer, Rect, Stage } from "react-konva";
 
 const ZoneStage = ({ stageSize, floormap, zones, newZone, onMouseDown, onMouseMove, onMouseUp }) => (
-    <Stage
-        width={stageSize.width}
-        height={stageSize.height}
-        style={{
-            backgroundImage: `url(${floormap.imageUrl || "/mnt/data/image.png"})`,
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-        }}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-    >
+    <Stage width={stageSize.width} height={stageSize.height} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp}>
         <Layer>
+            {/* Render existing zones */}
             {zones.map((zone, index) => (
                 <Rect
                     key={index}
@@ -24,9 +13,11 @@ const ZoneStage = ({ stageSize, floormap, zones, newZone, onMouseDown, onMouseMo
                     width={zone.width}
                     height={zone.height}
                     fill={`#${zone.color}`}
-                    opacity={0.5}
+                    stroke="black"
+                    strokeWidth={2}
                 />
             ))}
+            {/* Render the new zone being drawn */}
             {newZone && (
                 <Rect
                     x={newZone.x}
@@ -34,7 +25,8 @@ const ZoneStage = ({ stageSize, floormap, zones, newZone, onMouseDown, onMouseMo
                     width={newZone.width}
                     height={newZone.height}
                     fill={`#${newZone.color}`}
-                    opacity={0.5}
+                    stroke="black"
+                    strokeWidth={2}
                 />
             )}
         </Layer>
