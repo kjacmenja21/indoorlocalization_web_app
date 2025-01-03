@@ -1,8 +1,18 @@
-import React, { useState } from "react";
-import { Rect } from "react-konva";
+import React, { useEffect, useRef, useState } from "react";
+import { Rect, Transformer } from "react-konva";
 
 const ZoneEditor = ({ zone, onUpdate, isEditable }) => {
     const [isDragging, setIsDragging] = useState(false);
+    const shapeRef = useRef(null);
+    const trRef = useRef(null);
+
+    useEffect(() => {
+        if (isEditable && trRef.current && shapeRef.current) {
+            // Attach the transformer to the rectangle
+            trRef.current.nodes([shapeRef.current]);
+            trRef.current.getLayer().batchDraw();
+        }
+    }, [isEditable]);
 
     const handleDragStart = () => {
         console.log("Dragging zone", zone);
@@ -19,7 +29,7 @@ const ZoneEditor = ({ zone, onUpdate, isEditable }) => {
     };
 
     const handleTransformEnd = (e) => {
-        const node = e.target;
+        const node = shapeRef.current;
         const scaleX = node.scaleX();
         const scaleY = node.scaleY();
 
@@ -37,28 +47,36 @@ const ZoneEditor = ({ zone, onUpdate, isEditable }) => {
     };
 
     return (
-        <Rect
-            x={zone.x}
-            y={zone.y}
-            width={zone.width}
-            height={zone.height}
-            fill={`#${zone.color}`}
-            stroke={isDragging ? "blue" : "black"}
-            strokeWidth={2}
-            draggable={isEditable}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onTransformEnd={handleTransformEnd}
-            onClick={(e) => e.cancelBubble = true} // Prevent stage click events
-            ref={(node) => {
-                if (node && isEditable) {
-                    node.setAttrs({
-                        name: "zone",
-                        draggable: true,
-                    });
-                }
-            }}
-        />
+        <>
+            <Rect
+                x={zone.x}
+                y={zone.y}
+                width={zone.width}
+                height={zone.height}
+                fill={`#${zone.color}`}
+                stroke={isDragging ? "blue" : "black"}
+                strokeWidth={2}
+                draggable={isEditable}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+                onTransformEnd={handleTransformEnd}
+                onClick={(e) => e.cancelBubble = true} // Prevent stage click events
+                ref={shapeRef}
+            />
+            {isEditable && (
+                <Transformer
+                    ref={trRef}
+                    rotateEnabled={false} // Optional: Disable rotation if you don't need it
+                    boundBoxFunc={(oldBox, newBox) => {
+                        // Prevent resizing to negative values
+                        if (newBox.width < 5 || newBox.height < 5) {
+                            return oldBox;
+                        }
+                        return newBox;
+                    }}
+                />
+            )}
+        </>
     );
 };
 
