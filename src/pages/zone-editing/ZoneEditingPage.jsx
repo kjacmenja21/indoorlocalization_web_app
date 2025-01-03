@@ -173,6 +173,31 @@ function ZoneEditing() {
         setZones(updatedZones);
     };
 
+    const handleNewZoneUpdate = (updatedZone) => {
+        if (!zoneName) {
+            setZoneNameError(true); // Handle missing name error
+            return;
+        }
+
+        // Finalize the new zone with its name and converted data
+        const finalizedZone = {
+            ...updatedZone,
+            name: zoneName,
+        };
+
+        // Update the zones state and reset new zone state
+        setZones((prevZones) => [...prevZones, finalizedZone]);
+        setNewZone(null);
+        setZoneName(""); // Clear the name input
+        setZoneNameError(false);
+        setIsDrawing(false);
+        setIsFinishedDrawing(false);
+
+        console.log("New zone added:", finalizedZone);
+        console.log("Converted zone for backend:", convertZoneData(finalizedZone, floormapId));
+    };
+
+
     return (
         <div className="zone-editing">
             <h2>Floormap Detail for {floormapId}</h2>
@@ -190,6 +215,7 @@ function ZoneEditing() {
                         onMouseMove={handleMouseMove}
                         onMouseUp={handleMouseUp}
                         onZoneUpdate={handleZoneUpdate}
+                        onNewZoneUpdate={handleNewZoneUpdate}
                         isEditable={isEditable}
                     />
                 </div>

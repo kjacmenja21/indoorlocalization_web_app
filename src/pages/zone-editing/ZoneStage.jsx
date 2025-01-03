@@ -11,6 +11,7 @@ const ZoneStage = ({
                        onMouseMove,
                        onMouseUp,
                        onZoneUpdate,
+                       onNewZoneUpdate,
                        isEditable,
                    }) => (
     <Stage
@@ -23,12 +24,12 @@ const ZoneStage = ({
         <Layer>
             {/* Render existing zones with interactive editing */}
             {zones.map((zone, index) => (
-                console.log("ZoneStage.jsx", zone),
                 <ZoneEditor
                     key={index}
                     zone={zone}
                     onUpdate={(updatedZone) => onZoneUpdate(index, updatedZone)}
                     isEditable={isEditable}
+                    stageSize={stageSize}
                 />
             ))}
 
@@ -36,8 +37,9 @@ const ZoneStage = ({
             {newZone && (
                 <ZoneEditor
                     zone={newZone}
-                    isEditable={false} // New zone isn't editable until finalized
-                    onUpdate={() => {}}
+                    isEditable={true} // Allow editing if necessary
+                    onUpdate={onNewZoneUpdate} // Define how to handle updates for a new zone
+                    stageSize={stageSize}
                 />
             )}
         </Layer>

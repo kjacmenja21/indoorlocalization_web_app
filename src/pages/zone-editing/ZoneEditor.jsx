@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Rect, Transformer } from "react-konva";
 
-const ZoneEditor = ({ zone, onUpdate, isEditable }) => {
+const ZoneEditor = ({ zone, onUpdate, isEditable, stageSize }) => {
     const [isDragging, setIsDragging] = useState(false);
     const shapeRef = useRef(null);
     const trRef = useRef(null);
@@ -15,20 +15,33 @@ const ZoneEditor = ({ zone, onUpdate, isEditable }) => {
     }, [isEditable]);
 
     const handleDragStart = () => {
-        console.log("Dragging zone", zone);
         setIsDragging(true);
     };
 
     const handleDragEnd = (e) => {
         setIsDragging(false);
+
+        // Ensure the rectangle stays within bounds
+        const node = e.target;
+        const newX = Math.min(
+            Math.max(node.x(), 0),
+            stageSize.width - zone.width
+        );
+        const newY = Math.min(
+            Math.max(node.y(), 0),
+            stageSize.height - zone.height
+        );
+
+        node.position({ x: newX, y: newY });
+
         onUpdate({
             ...zone,
-            x: e.target.x(),
-            y: e.target.y(),
+            x: newX,
+            y: newY,
         });
     };
 
-    const handleTransformEnd = (e) => {
+    const handleTransformEnd = () => {
         const node = shapeRef.current;
         const scaleX = node.scaleX();
         const scaleY = node.scaleY();
@@ -37,12 +50,27 @@ const ZoneEditor = ({ zone, onUpdate, isEditable }) => {
         node.scaleX(1);
         node.scaleY(1);
 
+        // Calculate new dimensions and enforce boundaries
+        const newWidth = Math.max(5, node.width() * scaleX);
+        const newHeight = Math.max(5, node.height() * scaleY);
+
+        const newX = Math.min(
+            Math.max(node.x(), 0),
+            stageSize.width - newWidth
+        );
+        const newY = Math.min(
+            Math.max(node.y(), 0),
+            stageSize.height - newHeight
+        );
+
+        node.position({ x: newX, y: newY });
+
         onUpdate({
             ...zone,
-            x: node.x(),
-            y: node.y(),
-            width: Math.max(5, node.width() * scaleX),
-            height: Math.max(5, node.height() * scaleY),
+            x: newX,
+            y: newY,
+            width: newWidth,
+            height: newHeight,
         });
     };
 
@@ -60,7 +88,6 @@ const ZoneEditor = ({ zone, onUpdate, isEditable }) => {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onTransformEnd={handleTransformEnd}
-                onClick={(e) => e.cancelBubble = true} // Prevent stage click events
                 ref={shapeRef}
             />
             {isEditable && (
@@ -68,7 +95,16 @@ const ZoneEditor = ({ zone, onUpdate, isEditable }) => {
                     ref={trRef}
                     rotateEnabled={false} // Optional: Disable rotation if you don't need it
                     boundBoxFunc={(oldBox, newBox) => {
-                        // Prevent resizing to negative values
+                        // Ensure the rectangle stays within bounds during resizing
+                        if (newBox.x < 0 || newBox.y < 0) {
+                            return oldBox;
+                        }
+                        if (
+                            newBox.x + newBox.width > stageSize.width ||
+                            newBox.y + newBox.height > stageSize.height
+                        ) {
+                            return oldBox;
+                        }
                         if (newBox.width < 5 || newBox.height < 5) {
                             return oldBox;
                         }
