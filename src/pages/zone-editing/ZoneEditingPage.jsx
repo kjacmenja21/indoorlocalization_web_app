@@ -14,6 +14,7 @@ function ZoneEditing() {
     const [newZone, setNewZone] = useState(null);
     const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
     const [isDrawing, setIsDrawing] = useState(false);
+    const [isEditable, setIsEditable] = useState(false);
     const [zoneName, setZoneName] = useState("");
     const [zoneNameError, setZoneNameError] = useState(false);
     const [isFinishedDrawing, setIsFinishedDrawing] = useState(false);
@@ -123,6 +124,11 @@ function ZoneEditing() {
         }
     };
 
+    const toggleEditMode = () => {
+        setIsEditable((prev) => !prev);
+        console.log("zones:", zones);
+    };
+
     const convertZoneData = (zoneData, floorMapId) => {
         const { name, color, x, y, width, height } = zoneData;
 
@@ -161,10 +167,19 @@ function ZoneEditing() {
         };
     };
 
+    const handleZoneUpdate = (index, updatedZone) => {
+        const updatedZones = [...zones];
+        updatedZones[index] = updatedZone;
+        setZones(updatedZones);
+    };
+
     return (
         <div className="zone-editing">
             <h2>Floormap Detail for {floormapId}</h2>
             <div className="zone-editing-container">
+                <button onClick={toggleEditMode}>
+                    {isEditable ? "Disable Editing" : "Enable Editing"}
+                </button>
                 <div className="stage-container" ref={containerRef}>
                     <ZoneStage
                         stageSize={stageSize}
@@ -174,6 +189,8 @@ function ZoneEditing() {
                         onMouseDown={handleMouseDown}
                         onMouseMove={handleMouseMove}
                         onMouseUp={handleMouseUp}
+                        onZoneUpdate={handleZoneUpdate}
+                        isEditable={isEditable}
                     />
                 </div>
                 <ZoneMenu

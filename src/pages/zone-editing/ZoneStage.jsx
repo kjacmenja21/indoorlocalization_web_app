@@ -1,32 +1,43 @@
 import React from "react";
-import { Layer, Rect, Stage } from "react-konva";
+import { Layer, Stage } from "react-konva";
+import ZoneEditor from "./ZoneEditor";
 
-const ZoneStage = ({ stageSize, floormap, zones, newZone, onMouseDown, onMouseMove, onMouseUp }) => (
-    <Stage width={stageSize.width} height={stageSize.height} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp}>
+const ZoneStage = ({
+                       stageSize,
+                       floormap,
+                       zones,
+                       newZone,
+                       onMouseDown,
+                       onMouseMove,
+                       onMouseUp,
+                       onZoneUpdate,
+                       isEditable,
+                   }) => (
+    <Stage
+        width={stageSize.width}
+        height={stageSize.height}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+    >
         <Layer>
-            {/* Render existing zones */}
+            {/* Render existing zones with interactive editing */}
             {zones.map((zone, index) => (
-                <Rect
+                console.log("ZoneStage.jsx", zone),
+                <ZoneEditor
                     key={index}
-                    x={zone.x}
-                    y={zone.y}
-                    width={zone.width}
-                    height={zone.height}
-                    fill={`#${zone.color}`}
-                    stroke="black"
-                    strokeWidth={2}
+                    zone={zone}
+                    onUpdate={(updatedZone) => onZoneUpdate(index, updatedZone)}
+                    isEditable={isEditable}
                 />
             ))}
+
             {/* Render the new zone being drawn */}
             {newZone && (
-                <Rect
-                    x={newZone.x}
-                    y={newZone.y}
-                    width={newZone.width}
-                    height={newZone.height}
-                    fill={`#${newZone.color}`}
-                    stroke="black"
-                    strokeWidth={2}
+                <ZoneEditor
+                    zone={newZone}
+                    isEditable={false} // New zone isn't editable until finalized
+                    onUpdate={() => {}}
                 />
             )}
         </Layer>
