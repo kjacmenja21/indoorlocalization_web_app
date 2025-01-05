@@ -19,6 +19,7 @@ function ZoneEditing() {
     const [zoneNameError, setZoneNameError] = useState(false);
     const [isFinishedDrawing, setIsFinishedDrawing] = useState(false);
     const containerRef = useRef();
+    const [updatedZoneIndices, setUpdatedZoneIndices] = useState(new Set());
 
     useEffect(() => {
         FloorMapService.getFloorMapById(floormapId)
@@ -171,6 +172,29 @@ function ZoneEditing() {
         const updatedZones = [...zones];
         updatedZones[index] = updatedZone;
         setZones(updatedZones);
+
+        // Track updated zones
+        setUpdatedZoneIndices((prevSet) => {
+            const newSet = new Set(prevSet);
+            newSet.add(index);
+            return newSet;
+        });
+    };
+
+    const saveUpdatedZones = () => {
+
+        updatedZoneIndices.forEach((index) => {
+            console.log("Converting: ", zones[index],);
+        });
+        const zonesToSave = Array.from(updatedZoneIndices).map((index) =>
+            convertZoneData(zones[index], floormapId)
+        );
+
+        // Mock API call or actual call
+        console.log("Saving zones:", zonesToSave);
+
+        // Clear updated zone tracking on successful save
+        setUpdatedZoneIndices(new Set());
     };
 
     const handleNewZoneUpdate = (updatedZone) => {
@@ -204,6 +228,12 @@ function ZoneEditing() {
             <div className="zone-editing-container">
                 <button onClick={toggleEditMode}>
                     {isEditable ? "Disable Editing" : "Enable Editing"}
+                </button>
+                <button
+                    onClick={saveUpdatedZones}
+                    disabled={updatedZoneIndices.size === 0}
+                >
+                    {`Save Changes (${updatedZoneIndices.size})`}
                 </button>
                 <div className="stage-container" ref={containerRef}>
                     <ZoneStage
