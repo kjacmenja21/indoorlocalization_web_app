@@ -106,16 +106,27 @@ function ZoneEditing() {
             setZoneNameError(true);
             return;
         }
-        const updatedZones = [...zones, { ...newZone, name: zoneName }];
+
+        const newZoneData = { ...newZone, name: zoneName };
+        for (const zone of zones) {
+            if (areZonesOverlapping(newZoneData, zone)) {
+                console.log("Overlapping zones:", newZoneData, zone);
+                alert(
+                    `The new zone "${zoneName}" overlaps with the existing zone "${zone.name}". Please adjust its position or size.`
+                );
+                return;
+            }
+        }
+
+        const updatedZones = [...zones, newZoneData];
         setZones(updatedZones);
         setNewZone(null);
         setZoneName("");
         setZoneNameError(false);
         setIsFinishedDrawing(false);
         setIsDrawing(false);
-        console.log("Zone submitted:", { ...newZone, name: zoneName });
-        console.log("Zone after convertion:", convertZoneData({ ...newZone, name: zoneName }, floormapId));
 
+        console.log("Zone submitted:", newZoneData);
     };
 
     // Handle undo for the ongoing drawing
@@ -129,6 +140,23 @@ function ZoneEditing() {
         setIsEditable((prev) => !prev);
         console.log("zones:", zones);
     };
+    const round = (value) => Math.round(value * 100) / 100; // Rounds to 2 decimal places
+
+    const areZonesOverlapping = (zoneA, zoneB) => {
+        const ax1 = zoneA.x;
+        const ay1 = zoneA.y;
+        const ax2 = zoneA.x + zoneA.width;
+        const ay2 = zoneA.y + zoneA.height;
+
+        const bx1 = zoneB.x;
+        const by1 = zoneB.y;
+        const bx2 = zoneB.x + zoneB.width;
+        const by2 = zoneB.y + zoneB.height;
+        console.log("ax1:", ax1, "ay1:", ay1, "ax2:", ax2, "ay2:", ay2);
+        return !(ax2 <= bx1 || bx2 <= ax1 || ay2 <= by1 || by2 <= ay1);
+    };
+
+
 
     const convertZoneData = (zoneData, floorMapId) => {
         const { name, color, x, y, width, height } = zoneData;
@@ -172,7 +200,7 @@ function ZoneEditing() {
         const updatedZones = [...zones];
         updatedZones[index] = updatedZone;
         setZones(updatedZones);
-
+        console.log("Zone updated (handleZoneUpdate):", updatedZone);
         // Track updated zones
         setUpdatedZoneIndices((prevSet) => {
             const newSet = new Set(prevSet);
@@ -182,20 +210,37 @@ function ZoneEditing() {
     };
 
     const saveUpdatedZones = () => {
+        // Check for overlaps among updated zones
+        const updatedZonesArray = Array.from(updatedZoneIndices).map(
+            (index) => zones[index]
+        );
+        console.log("Checking overlaps among updated zones:", updatedZonesArray);
+        for (let i = 0; i < updatedZonesArray.length; i++) {
+            console.log("Checking zone:", updatedZonesArray[i]);
+            console.log("i:", i);
+            console.log("updatedZonesArray.length:", updatedZonesArray.length);
+            for (let j = 0; j < zones.length; j++) {
+                console.log("Checking overlap between:", updatedZonesArray[i], zones[j]);
+                if (areZonesOverlapping(updatedZonesArray[i], zones[j]) && updatedZonesArray[i].name !== zones[j].name) {
+                    alert(
+                        `Zones "${updatedZonesArray[i].name}" and "${zones[j].name}" overlap. Please resolve the conflict before saving.`
+                    );
+                    return;
+                }
+            }
+        }
 
-        updatedZoneIndices.forEach((index) => {
-            console.log("Converting: ", zones[index],);
-        });
-        const zonesToSave = Array.from(updatedZoneIndices).map((index) =>
-            convertZoneData(zones[index], floormapId)
+        // Convert and save zones
+        const zonesToSave = updatedZonesArray.map((zone) =>
+            convertZoneData(zone, floormapId)
         );
 
-        // Mock API call or actual call
         console.log("Saving zones:", zonesToSave);
 
         // Clear updated zone tracking on successful save
         setUpdatedZoneIndices(new Set());
     };
+
 
     const handleNewZoneUpdate = (updatedZone) => {
         if (!zoneName) {
