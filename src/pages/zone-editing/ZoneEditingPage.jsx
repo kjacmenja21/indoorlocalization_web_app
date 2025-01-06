@@ -10,7 +10,7 @@ import ZoneMenu from "./ZoneMenu.jsx";
 function ZoneEditing() {
     const { floormapId } = useParams();
     const [floormap, setFloormap] = useState({});
-    const [zones, setZones] = useState([]);
+    const [floormapScale, setFloormapScale] = useState(1);
     const [newZone, setNewZone] = useState(null);
     const [stageSize, setStageSize] = useState({ width: 800, height: 600 });
     const [isDrawing, setIsDrawing] = useState(false);
@@ -20,6 +20,9 @@ function ZoneEditing() {
     const [isFinishedDrawing, setIsFinishedDrawing] = useState(false);
     const containerRef = useRef();
     const [updatedZoneIndices, setUpdatedZoneIndices] = useState(new Set());
+
+    const [realWorldZones, setRealWorldZones] = useState([]);
+    const [scaledZones, setScaledZones] = useState([]);
 
     useEffect(() => {
         FloorMapService.getFloorMapById(floormapId)
@@ -47,11 +50,12 @@ function ZoneEditing() {
                 const stageWidth = floormap.width || 3000;
                 const stageHeight = floormap.height || 2000;
                 const scaleFactor = Math.min(containerWidth / stageWidth, containerHeight / stageHeight);
-
+                console.log("Stage size:", stageWidth, stageHeight);
                 setStageSize({
                     width: stageWidth * scaleFactor,
                     height: stageHeight * scaleFactor,
                 });
+                setFloormapScale(scaleFactor);
             }
         };
 
@@ -59,6 +63,24 @@ function ZoneEditing() {
         window.addEventListener("resize", updateStageSize);
         return () => window.removeEventListener("resize", updateStageSize);
     }, [floormap]);
+
+    const scaleZoneForDisplay = (zone) => ({
+        ...zone,
+        x: zone.x * floormapScale,
+        y: zone.y * floormapScale,
+        width: zone.width * floormapScale,
+        height: zone.height * floormapScale,
+    });
+    const scaleZonesForDisplay = (zones) => zones.map(scaleZoneForDisplay);
+
+    const convertZoneToRealWorld = (zone) => ({
+        ...zone,
+        x: zone.x / floormapScale,
+        y: zone.y / floormapScale,
+        width: zone.width / floormapScale,
+        height: zone.height / floormapScale,
+    });
+    const convertZonesToRealWorld = (zones) => zones.map(convertZoneToRealWorld);
 
     const handleMouseDown = (e) => {
         if (isDrawing && !newZone) {
@@ -108,7 +130,7 @@ function ZoneEditing() {
         }
 
         const newZoneData = { ...newZone, name: zoneName };
-        for (const zone of zones) {
+        for (const zone of scaledZones) {
             if (areZonesOverlapping(newZoneData, zone)) {
                 console.log("Overlapping zones:", newZoneData, zone);
                 alert(
@@ -118,8 +140,8 @@ function ZoneEditing() {
             }
         }
 
-        const updatedZones = [...zones, newZoneData];
-        setZones(updatedZones);
+        const updatedZones = [...scaledZones, newZoneData];
+        setScaledZones(updatedZones);
         setNewZone(null);
         setZoneName("");
         setZoneNameError(false);
@@ -138,7 +160,6 @@ function ZoneEditing() {
 
     const toggleEditMode = () => {
         setIsEditable((prev) => !prev);
-        console.log("zones:", zones);
     };
     const round = (value) => Math.round(value * 100) / 100; // Rounds to 2 decimal places
 
@@ -157,14 +178,19 @@ function ZoneEditing() {
     };
 
 
-
-    const convertZoneData = (zoneData, floorMapId) => {
+    const convertZoneData = (zoneData, floorMapId, scale) => {
         const { name, color, x, y, width, height } = zoneData;
 
+        // Scale back to real-world dimensions
+        const realX = x / scale;
+        const realY = y / scale;
+        const realWidth = width / scale;
+        const realHeight = height / scale;
+
         const points = [
-            { ordinalNumber: 0, x, y }, // Top-left corner
-            { ordinalNumber: 1, x: x + width, y }, // Top-right corner
-            { ordinalNumber: 2, x, y: y + height }, // Bottom-left corner
+            { ordinalNumber: 0, x: realX, y: realY }, // Top-left corner
+            { ordinalNumber: 1, x: realX + realWidth, y: realY }, // Top-right corner
+            { ordinalNumber: 2, x: realX, y: realY + realHeight }, // Bottom-left corner
         ];
 
         return {
@@ -196,11 +222,24 @@ function ZoneEditing() {
         };
     };
 
-    const handleZoneUpdate = (index, updatedZone) => {
-        const updatedZones = [...zones];
-        updatedZones[index] = updatedZone;
-        setZones(updatedZones);
-        console.log("Zone updated (handleZoneUpdate):", updatedZone);
+    const handleZoneUpdate = (index, updatedScaledZone) => {
+        console.log("Updating zone:", index, updatedScaledZone);
+
+        // Convert scaled zone to real-world format
+        const updatedRealWorldZone = convertZoneToRealWorld(updatedScaledZone);
+
+        // Update real-world zones
+        const updatedRealWorldZones = [...realWorldZones];
+        updatedRealWorldZones[index] = updatedRealWorldZone;
+        setRealWorldZones(updatedRealWorldZones);
+
+        // Update scaled zones
+        const updatedScaledZones = [...scaledZones];
+        updatedScaledZones[index] = updatedScaledZone;
+        setScaledZones(updatedScaledZones);
+
+        console.log("Zone updated:", { updatedRealWorldZone, updatedScaledZone });
+
         // Track updated zones
         setUpdatedZoneIndices((prevSet) => {
             const newSet = new Set(prevSet);
@@ -210,36 +249,44 @@ function ZoneEditing() {
     };
 
     const saveUpdatedZones = () => {
-        // Check for overlaps among updated zones
+        // Extract updated zones based on updatedZoneIndices
         const updatedZonesArray = Array.from(updatedZoneIndices).map(
-            (index) => zones[index]
+            (index) => scaledZones[index]
         );
+
+        // Check for overlaps among updated zones and all zones
         console.log("Checking overlaps among updated zones:", updatedZonesArray);
+        console.log("updatedScaledZones:", scaledZones);
+
         for (let i = 0; i < updatedZonesArray.length; i++) {
-            console.log("Checking zone:", updatedZonesArray[i]);
-            console.log("i:", i);
-            console.log("updatedZonesArray.length:", updatedZonesArray.length);
-            for (let j = 0; j < zones.length; j++) {
-                console.log("Checking overlap between:", updatedZonesArray[i], zones[j]);
-                if (areZonesOverlapping(updatedZonesArray[i], zones[j]) && updatedZonesArray[i].name !== zones[j].name) {
+            for (let j = 0; j < scaledZones.length; j++) {
+                if (
+                    areZonesOverlapping(updatedZonesArray[i], scaledZones[j]) &&
+                    updatedZonesArray[i].name !== scaledZones[j].name
+                ) {
                     alert(
-                        `Zones "${updatedZonesArray[i].name}" and "${zones[j].name}" overlap. Please resolve the conflict before saving.`
+                        `Zones "${updatedZonesArray[i].name}" and "${scaledZones[j].name}" overlap. Please resolve the conflict before saving.`
                     );
                     return;
                 }
             }
         }
 
-        // Convert and save zones
-        const zonesToSave = updatedZonesArray.map((zone) =>
-            convertZoneData(zone, floormapId)
+        // Prepare zones for backend
+        const updatedRealWorldZones = Array.from(updatedZoneIndices).map(
+            (index) => realWorldZones[index]
+        );
+        const zonesToSave = updatedRealWorldZones.map((zone) =>
+            convertZoneData(zone, floormapId, 1) // Scale is 1 as zones are in real-world dimensions
         );
 
-        console.log("Saving zones:", zonesToSave);
+        console.log("Saving updated zones to backend:", zonesToSave);
 
-        // Clear updated zone tracking on successful save
+        // Perform save operation (placeholder)
+        // If successful, clear the updated zone indices
         setUpdatedZoneIndices(new Set());
     };
+
 
 
     const handleNewZoneUpdate = (updatedZone) => {
@@ -255,7 +302,9 @@ function ZoneEditing() {
         };
 
         // Update the zones state and reset new zone state
-        setZones((prevZones) => [...prevZones, finalizedZone]);
+        const newRealWorldZone = convertZoneToRealWorld(finalizedZone);
+        setRealWorldZones((prevZones) => [...prevZones, newRealWorldZone]);
+        setScaledZones((prevZones) => [...prevZones, finalizedZone]);
         setNewZone(null);
         setZoneName(""); // Clear the name input
         setZoneNameError(false);
@@ -284,7 +333,7 @@ function ZoneEditing() {
                     <ZoneStage
                         stageSize={stageSize}
                         floormap={floormap}
-                        zones={zones}
+                        zones={scaledZones}
                         newZone={newZone}
                         onMouseDown={handleMouseDown}
                         onMouseMove={handleMouseMove}
