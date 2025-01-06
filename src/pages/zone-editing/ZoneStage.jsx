@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+import ZoneEditor from "./ZoneEditor.jsx";
 import { Layer, Stage } from "react-konva";
-import ZoneEditor from "./ZoneEditor";
 
 const ZoneStage = ({
                        stageSize,
@@ -13,37 +13,71 @@ const ZoneStage = ({
                        onZoneUpdate,
                        onNewZoneUpdate,
                        isEditable,
-                   }) => (
-    <Stage
-        width={stageSize.width}
-        height={stageSize.height}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-    >
-        <Layer>
-            {/* Render existing zones with interactive editing */}
-            {zones.map((zone, index) => (
-                <ZoneEditor
-                    key={index}
-                    zone={zone}
-                    onUpdate={(updatedZone) => onZoneUpdate(index, updatedZone)}
-                    isEditable={isEditable}
-                    stageSize={stageSize}
-                />
-            ))}
+                       onDeleteZone,
+                   }) => {
+    const [selectedZoneId, setSelectedZoneId] = useState(null);
 
-            {/* Render the new zone being drawn */}
-            {newZone && (
-                <ZoneEditor
-                    zone={newZone}
-                    isEditable={true} // Allow editing if necessary
-                    onUpdate={onNewZoneUpdate} // Define how to handle updates for a new zone
-                    stageSize={stageSize}
-                />
+    const handleZoneClick = (zoneId) => {
+        // Toggle selection of the clicked zone
+        setSelectedZoneId(zoneId === selectedZoneId ? null : zoneId);
+    };
+
+    const handleDeleteClick = () => {
+        if (selectedZoneId) {
+            const selectedZone = zones.find((zone) => zone.id === selectedZoneId);
+            if (window.confirm(`Are you sure you want to delete the zone "${selectedZone.name}"?`)) {
+                onDeleteZone(selectedZoneId);
+                setSelectedZoneId(null); // Deselect after deletion
+            }
+        }
+    };
+
+    return (
+        <div>
+            <Stage
+                width={stageSize.width}
+                height={stageSize.height}
+                onMouseDown={onMouseDown}
+                onMouseMove={onMouseMove}
+                onMouseUp={onMouseUp}
+            >
+                <Layer>
+                    {zones.map((zone, index) => (
+                        <ZoneEditor
+                            key={index}
+                            zone={zone}
+                            onUpdate={(updatedZone) => onZoneUpdate(index, updatedZone)}
+                            isEditable={isEditable}
+                            stageSize={stageSize}
+                            isSelected={zone.id === selectedZoneId} // Pass selection status
+                            onClick={() => handleZoneClick(zone.id)} // Handle zone click
+                        />
+                    ))}
+                    {newZone && (
+                        <ZoneEditor
+                            zone={newZone}
+                            isEditable={true}
+                            onUpdate={onNewZoneUpdate}
+                            stageSize={stageSize}
+                        />
+                    )}
+                </Layer>
+            </Stage>
+
+            {selectedZoneId && (
+                <button
+                    onClick={handleDeleteClick}
+                    style={{
+                        position: "absolute",
+                        top: 10,
+                        left: 10,
+                    }}
+                >
+                    Delete Zone
+                </button>
             )}
-        </Layer>
-    </Stage>
-);
+        </div>
+    );
+};
 
 export default ZoneStage;

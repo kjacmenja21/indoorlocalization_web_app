@@ -378,8 +378,6 @@ function ZoneEditing() {
 
     };
 
-
-
     const handleNewZoneUpdate = (updatedZone) => {
         if (!zoneName) {
             setZoneNameError(true); // Handle missing name error
@@ -406,6 +404,19 @@ function ZoneEditing() {
         console.log("Converted zone for backend:", convertZoneData(finalizedZone, floormapId));
     };
 
+    const handleDeleteZone = (zoneId) => {
+        const updatedZones = scaledZones.filter((zone) => zone.id !== zoneId);
+        setScaledZones(updatedZones);
+
+        // Also delete from backend
+        ZoneService.deleteZone(zoneId)
+            .then(() => {
+                console.log(`Zone with ID ${zoneId} deleted successfully`);
+            })
+            .catch((error) => {
+                console.error(`Error deleting zone with ID ${zoneId}:`, error);
+            });
+    };
 
     return (
         <div className="zone-editing">
@@ -423,7 +434,6 @@ function ZoneEditing() {
                 <div className="stage-container" ref={containerRef}>
                     <ZoneStage
                         stageSize={stageSize}
-                        floormap={floormap}
                         zones={scaledZones}
                         newZone={newZone}
                         onMouseDown={handleMouseDown}
@@ -432,6 +442,7 @@ function ZoneEditing() {
                         onZoneUpdate={handleZoneUpdate}
                         onNewZoneUpdate={handleNewZoneUpdate}
                         isEditable={isEditable}
+                        onDeleteZone={handleDeleteZone}
                     />
                 </div>
                 <ZoneMenu

@@ -21,4 +21,14 @@ export const ZoneService = {
             console.error(`Error fetching zones: ${errorMessage}`);
         }
     },
+
+    deleteZone: async (zoneId) => {
+        try {
+            const response = await axiosInstance.delete(`${API_PATHS.ZONES}${zoneId}`);
+            return response.data;
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || "Failed to delete zone";
+            console.error(`Error deleting zone: ${errorMessage}`);
+        }
+    },
 };
