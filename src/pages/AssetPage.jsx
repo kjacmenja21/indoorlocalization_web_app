@@ -62,6 +62,16 @@ function AssetPage() {
     }
   };
 
+  const handleAddingAsset = async (newAsset) => {
+    try {
+      console.log("New asset:", newAsset)
+      const addedAsset = await AssetService.addAsset(newAsset);
+      setAssets([...assets, addedAsset]);
+    } catch (error) {
+      console.error("Error adding asset:", error.message);
+    }
+  }
+
   return (
     <div className="asset-page">
       <div className="asset-container">
@@ -70,7 +80,9 @@ function AssetPage() {
         </div>
         <div className="asset-container__content">
           <Modal buttonText="Add asset" title="Add new asset">
-            <AddAssetForm />
+            <AddAssetForm
+                onAddAsset={handleAddingAsset}
+            />
           </Modal>
         </div>
       </div>
