@@ -177,7 +177,7 @@ function ZoneEditing() {
             width: newZone.width,
             height: newZone.height,
         };
-
+        const savedZoneData = newZoneData;
         newZoneData = convertZoneData(newZoneData, floormapId, floormapScale)
 
         console.log("Zone submitted:", newZoneData);
@@ -187,7 +187,7 @@ function ZoneEditing() {
 
             if (savedZone) {
                 // If the zone is successfully saved, update the local state
-                const updatedZones = [...scaledZones, savedZone];
+                const updatedZones = [...scaledZones, savedZoneData];
                 setScaledZones(updatedZones);
                 setNewZone(null);
                 setZoneName("");
@@ -305,7 +305,7 @@ function ZoneEditing() {
         });
     };
 
-    const saveUpdatedZones = () => {
+    const saveUpdatedZones = async () => {
         // Extract updated zones based on updatedZoneIndices
         const updatedZonesArray = Array.from(updatedZoneIndices).map(
             (index) => scaledZones[index]
@@ -338,10 +338,44 @@ function ZoneEditing() {
         );
 
         console.log("Saving updated zones to backend:", zonesToSave);
+        /* TODO: When the backend is ready, activate this code block
+        try {
+            // Simulate a backend API call to update zones
+            const updatedZones = await ZoneService.updateZones(zonesToSave);
 
-        // Perform save operation (placeholder)
-        // If successful, clear the updated zone indices
+            if (updatedZones) {
+                // If successful, update the state
+                const updatedScaledZones = updatedZones.map((zone) =>
+                    convertZoneData(zone, floormapId, 1 / floormapScale) // Scale zones back for display
+                );
+
+                setScaledZones((prevZones) => {
+                    const newZones = [...prevZones];
+                    updatedZoneIndices.forEach((index, i) => {
+                        newZones[index] = updatedScaledZones[i];
+                    });
+                    return newZones;
+                });
+
+                setRealWorldZones((prevZones) => {
+                    const newZones = [...prevZones];
+                    updatedZoneIndices.forEach((index, i) => {
+                        newZones[index] = updatedZones[i];
+                    });
+                    return newZones;
+                });
+
+                setUpdatedZoneIndices(new Set());
+                console.log("Zones successfully updated and saved:", updatedZones);
+            } else {
+                alert("Failed to update zones. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error updating zones:", error);
+            alert("An error occurred while updating the zones. Please try again later.");
+        }*/
         setUpdatedZoneIndices(new Set());
+
     };
 
 
