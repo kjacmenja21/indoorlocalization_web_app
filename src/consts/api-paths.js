@@ -15,4 +15,7 @@ export const API_PATHS = {
   FLOORMAPS_GET_BY_ID: "floor-maps/",
   FLOORMAPS_POST: "floor-maps/",
   FLOORMAPS_DELETE: "floormaps/",
+
+  /* ZONES */
+    ZONES: "zones/",
 };

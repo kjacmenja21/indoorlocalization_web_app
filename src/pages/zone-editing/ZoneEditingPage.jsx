@@ -5,6 +5,7 @@ import { FloorMapService } from "../../services/floormapService.js";
 import "../_pages.scss";
 import ZoneStage from "./ZoneStage";
 import ZoneMenu from "./ZoneMenu.jsx";
+import {ZoneService} from "../../services/zoneService.js";
 
 
 function ZoneEditing() {
@@ -23,23 +24,29 @@ function ZoneEditing() {
 
     const [realWorldZones, setRealWorldZones] = useState([]);
     const [scaledZones, setScaledZones] = useState([]);
+    const [backendZones, setBackendZones] = useState([]);
 
     useEffect(() => {
         FloorMapService.getFloorMapById(floormapId)
             .then((floormap) => {
                 console.log(`Fetched floormap details for ID ${floormapId}:`, floormap);
                 setFloormap(floormap);
+
+                // Fetch zones associated with the floormap
+                ZoneService.getZones(floormapId)
+                    .then((zones) => {
+                        console.log(`Fetched zones for floormap ID ${floormapId}:`, zones);
+                        setBackendZones(zones);
+                    })
+                    .catch((error) => {
+                        console.error(`Error fetching zones for floormap ID ${floormapId}:`, error);
+                    });
             })
             .catch((error) => {
                 console.error(`Error fetching floormap details for ID ${floormapId}:`, error);
             });
     }, [floormapId]);
 
-    useEffect(() => {
-        // Prepare to fetch zones (not implemented yet)
-        // Placeholder for future API call
-        console.log(`Prepare to fetch zones for floormap ${floormapId}`);
-    }, [floormapId]);
 
     useEffect(() => {
         const updateStageSize = () => {
@@ -64,14 +71,37 @@ function ZoneEditing() {
         return () => window.removeEventListener("resize", updateStageSize);
     }, [floormap]);
 
-    const scaleZoneForDisplay = (zone) => ({
-        ...zone,
-        x: zone.x * floormapScale,
-        y: zone.y * floormapScale,
-        width: zone.width * floormapScale,
-        height: zone.height * floormapScale,
-    });
-    const scaleZonesForDisplay = (zones) => zones.map(scaleZoneForDisplay);
+    useEffect(() => {
+        console.log("Backend zones:", backendZones);
+        setScaledZones(convertZonesForDisplay(backendZones, floormapScale));
+        console.log("Scaled zones:", scaledZones);
+    }, [floormapScale, backendZones]);
+
+    const convertZonesForDisplay = (zones, scale) => {
+        return zones.map((zone) => {
+            // Extract the bounding box from the points
+            const minX = Math.min(...zone.points.map((p) => p.x));
+            const minY = Math.min(...zone.points.map((p) => p.y));
+            const maxX = Math.max(...zone.points.map((p) => p.x));
+            const maxY = Math.max(...zone.points.map((p) => p.y));
+
+            // Calculate the dimensions
+            const width = maxX - minX;
+            const height = maxY - minY;
+
+            // Return the zone in the drawing format, scaled for display
+            return {
+                id: zone.id,
+                name: zone.name,
+                color: `#${zone.color.toString(16).padStart(6, '0')}`, // Convert color to hex
+                x: minX * scale,
+                y: minY * scale,
+                width: width * scale,
+                height: height * scale,
+            };
+        });
+    };
+
 
     const convertZoneToRealWorld = (zone) => ({
         ...zone,
@@ -123,13 +153,13 @@ function ZoneEditing() {
         setZoneNameError(false);
     };
 
-    const handleSubmitZone = () => {
+    const handleSubmitZone = async () => {
         if (!zoneName) {
             setZoneNameError(true);
             return;
         }
-
-        const newZoneData = { ...newZone, name: zoneName };
+        console.log("New zone to submit:", newZone);
+        let newZoneData = {...newZone, name: zoneName};
         for (const zone of scaledZones) {
             if (areZonesOverlapping(newZoneData, zone)) {
                 console.log("Overlapping zones:", newZoneData, zone);
@@ -139,16 +169,40 @@ function ZoneEditing() {
                 return;
             }
         }
+        newZoneData = {
+            name: zoneName,
+            color: newZone.color,
+            x: newZone.x,
+            y: newZone.y,
+            width: newZone.width,
+            height: newZone.height,
+        };
 
-        const updatedZones = [...scaledZones, newZoneData];
-        setScaledZones(updatedZones);
-        setNewZone(null);
-        setZoneName("");
-        setZoneNameError(false);
-        setIsFinishedDrawing(false);
-        setIsDrawing(false);
+        newZoneData = convertZoneData(newZoneData, floormapId, floormapScale)
 
         console.log("Zone submitted:", newZoneData);
+        try {
+            // Call the backend service to add the zone
+            const savedZone = await ZoneService.addZone(newZoneData);
+
+            if (savedZone) {
+                // If the zone is successfully saved, update the local state
+                const updatedZones = [...scaledZones, savedZone];
+                setScaledZones(updatedZones);
+                setNewZone(null);
+                setZoneName("");
+                setZoneNameError(false);
+                setIsFinishedDrawing(false);
+                setIsDrawing(false);
+
+                console.log("Zone successfully submitted and saved:", savedZone);
+            } else {
+                alert("Failed to save the zone. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error submitting zone:", error);
+            alert("An error occurred while adding the zone. Please try again later.");
+        }
     };
 
     // Handle undo for the ongoing drawing
@@ -187,19 +241,22 @@ function ZoneEditing() {
         const realWidth = width / scale;
         const realHeight = height / scale;
 
+        // Define all four corners of the rectangle
         const points = [
             { ordinalNumber: 0, x: realX, y: realY }, // Top-left corner
             { ordinalNumber: 1, x: realX + realWidth, y: realY }, // Top-right corner
-            { ordinalNumber: 2, x: realX, y: realY + realHeight }, // Bottom-left corner
+            { ordinalNumber: 2, x: realX + realWidth, y: realY + realHeight }, // Bottom-right corner
+            { ordinalNumber: 3, x: realX, y: realY + realHeight }, // Bottom-left corner
         ];
 
         return {
             name,
             floorMapId,
-            color: parseInt(color.replace('#', ''), 16),
+            color: parseInt(color.replace('#', ''), 16), // Convert hex color to integer
             points,
         };
     };
+
 
     const convertBackendZoneData = (backendZoneData) => {
         const { name, color, points } = backendZoneData;
