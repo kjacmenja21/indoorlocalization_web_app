@@ -38,10 +38,11 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     if (
       error.response &&
-      error.response.status === 401 &&
+      error.response.status === 401 || error.response.status === 422 &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
+      /*
       try {
         const tokens = await AuthService.refreshToken();
         axiosInstance.defaults.headers.common[
@@ -53,7 +54,8 @@ axiosInstance.interceptors.response.use(
         AuthService.logout();
         window.location.href = "/login";
         return Promise.reject(err);
-      }
+      }*/
+        await AuthService.logout();
     }
     return Promise.reject(error);
   }
