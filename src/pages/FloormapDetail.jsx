@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {FloorMapService} from "../services/floormapService.js";
+import AssetSimulationService from "../services/assetSimulationService.js";
 
 function FloormapDetail() {
     const { floormapId } = useParams();
@@ -11,60 +12,15 @@ function FloormapDetail() {
     const movementSpeed = 5; // Speed of asset movement (in pixels)
 
     useEffect(() => {
-        // Generate assets based on floormapId
-        const generateAssets = (floormapId) => {
-            let assets = [];
-            if (floormapId === "1") {
-                assets = [
-                    { id: 1, x: 50, y: 50 },
-                    { id: 2, x: 100, y: 150 },
-                    { id: 3, x: 200, y: 100 },
-                ];
-            } else if (floormapId === "2") {
-                assets = [
-                    { id: 4, x: 100, y: 50 },
-                    { id: 5, x: 150, y: 200 },
-                    { id: 6, x: 250, y: 150 },
-                ];
-            }
+        const simulationService = new AssetSimulationService(floormapId, floormapWidth, floormapHeight, movementSpeed);
 
-            // Return assets with the floormap ID attached
-            return assets.map((asset) => ({
-                ...asset,
-                floormapId: parseInt(floormapId),
-            }));
-        };
-
-        // Initialize the assets based on the floormapId
-        const initialAssets = generateAssets(floormapId);
-        setAssets(initialAssets);
-
-        // Function to simulate asset movement
-        const moveAssets = () => {
-            setAssets((prevAssets) => {
-                return prevAssets.map((asset) => {
-                    // Random movement in both x and y directions
-                    const newX = asset.x + (Math.random() * movementSpeed * 2 - movementSpeed);
-                    const newY = asset.y + (Math.random() * movementSpeed * 2 - movementSpeed);
-
-                    // Ensure assets stay within the bounds of the floormap
-                    const clampedX = Math.min(Math.max(newX, 0), floormapWidth - 10); // 10px for the asset size
-                    const clampedY = Math.min(Math.max(newY, 0), floormapHeight - 10); // 10px for the asset size
-
-                    return {
-                        ...asset,
-                        x: clampedX,
-                        y: clampedY,
-                    };
-                });
-            });
-        };
-
-        // Set an interval to move assets every 100ms
-        const intervalId = setInterval(moveAssets, 100);
+        // Start simulation and update assets
+        simulationService.startSimulation(setAssets);
 
         // Cleanup on component unmount
-        return () => clearInterval(intervalId);
+        return () => {
+            simulationService.stopSimulation();
+        };
     }, [floormapId]);
 
     const handleDeleteClick = async () => {
@@ -75,7 +31,7 @@ function FloormapDetail() {
             try {
                 await FloorMapService.deleteFloorMap(floormapId);
                 alert("Floor map deleted successfully!");
-                navigate("/home");  // Navigate to the HomePage after deletion
+                navigate("/home");
             } catch (error) {
                 alert("Failed to delete floor map. Please try again.");
             }
@@ -91,24 +47,23 @@ function FloormapDetail() {
                     width: `${floormapWidth}px`,
                     height: `${floormapHeight}px`,
                     border: "1px solid black",
-                    backgroundImage: `url('/mnt/data/image.png')`, // Background image path
+                    backgroundImage: `url('/mnt/data/image.png')`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                 }}
             >
-                {/* Render assets */}
                 {assets.map((asset) => (
                     <div
                         key={asset.id}
                         style={{
                             position: "absolute",
-                            top: `${asset.y}px`,  // Directly use asset's y position
-                            left: `${asset.x}px`, // Directly use asset's x position
+                            top: `${asset.y}px`,
+                            left: `${asset.x}px`,
                             width: "10px",
                             height: "10px",
                             backgroundColor: "red",
                             borderRadius: "50%",
-                            transform: "translate(-50%, -50%)", // Centers the asset
+                            transform: "translate(-50%, -50%)",
                         }}
                         title={`Asset ID: ${asset.id}, FloorMap ID: ${asset.floormapId}`}
                     ></div>
