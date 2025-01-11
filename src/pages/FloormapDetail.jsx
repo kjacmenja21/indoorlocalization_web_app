@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
-import {FloorMapService} from "../services/floormapService.js";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { FloorMapService } from "../services/floormapService.js";
 import AssetSimulationService from "../services/assetSimulationService.js";
 
 function FloormapDetail() {
     const { floormapId } = useParams();
     const navigate = useNavigate();
     const [assets, setAssets] = useState([]);
+    const [activeAsset, setActiveAsset] = useState(null); // Track the clicked asset
     const floormapWidth = 500; // Image width
     const floormapHeight = 300; // Image height
     const movementSpeed = 5; // Speed of asset movement (in pixels)
@@ -39,17 +40,14 @@ function FloormapDetail() {
     };
 
     return (
-        <div>
+        <div className="floormap-detail">
             <h2>Floormap Detail for {floormapId}</h2>
             <div
+                className="floormap-container"
                 style={{
-                    position: "relative",
+                    backgroundImage: `url('/mnt/data/image.png')`,
                     width: `${floormapWidth}px`,
                     height: `${floormapHeight}px`,
-                    border: "1px solid black",
-                    backgroundImage: `url('/mnt/data/image.png')`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
                 }}
             >
                 {assets.map((asset) => (
@@ -66,14 +64,32 @@ function FloormapDetail() {
                             transform: "translate(-50%, -50%)",
                         }}
                         title={`Asset ID: ${asset.id}, FloorMap ID: ${asset.floormapId}`}
-                    ></div>
+                        onClick={() => setActiveAsset(asset)}
+                    >
+                        <div className="name-tag">{asset.id}</div>
+
+                    </div>
                 ))}
+
             </div>
+
+            {activeAsset && (
+                <div className="dialog">
+                    <h3>Asset Details</h3>
+                    <p>ID: {activeAsset.id}</p>
+                    <p>X: {activeAsset.x}</p>
+                    <p>Y: {activeAsset.y}</p>
+                    <p>FloorMap ID: {activeAsset.floormapId}</p>
+                    <button onClick={() => setActiveAsset(null)}>Close</button>
+                </div>
+            )}
+
             <button onClick={handleDeleteClick}>Delete Floor Map</button>
-            <Link to={`/zone-editing/${floormapId}`} style={{ marginLeft: "10px" }}>
+            <Link to={`/zone-editing/${floormapId}`} style={{marginLeft: "10px"}}>
                 <button>Edit Zones</button>
             </Link>
         </div>
+
     );
 }
 
