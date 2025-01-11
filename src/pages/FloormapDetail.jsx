@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import AssetSimulationService from "../services/assetSimulationService.js";
+import {FloorMapService} from "../services/floormapService.js";
 
 function FloormapDetail() {
     const { floormapId } = useParams();
@@ -12,11 +14,15 @@ function FloormapDetail() {
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 }); // Drag start position
 
     useEffect(() => {
-        // Fetch or simulate asset positions here (replace with actual logic)
-        setAssets([
-            { id: 1, x: 100, y: 100 },
-            { id: 2, x: 200, y: 200 },
-        ]);
+        FloorMapService.getFloorMapById(floormapId).then((floormap) => {
+            if (!floormap) {
+                navigate("/floormaps");
+                return;
+            }
+            let assetSimulationService = new AssetSimulationService(floormapId, floormap.width, floormap.height, 5);
+            assetSimulationService.startSimulation(setAssets);
+        });
+
     }, []);
 
     const handleZoomIn = () => setZoom((prevZoom) => Math.min(prevZoom + 0.1, 3)); // Max zoom: 3x
