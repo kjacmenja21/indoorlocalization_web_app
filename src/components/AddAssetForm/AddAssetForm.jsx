@@ -5,8 +5,7 @@ import { FloorMapService } from "../../services/floormapService.js";
 function AddAssetForm({ onAddAsset, closeModal }) {
     const [newAsset, setNewAsset] = useState({
         name: "",
-        x: 0,
-        y: 0,
+        active: true,
         floormap_id: null,
     });
     const [floorMaps, setFloorMaps] = useState([]);
@@ -32,7 +31,7 @@ function AddAssetForm({ onAddAsset, closeModal }) {
         }
         onAddAsset(newAsset);
         closeModal();
-        setNewAsset({ name: "", x: 0, y: 0, floormap_id: null }); // Reset the form
+        setNewAsset({ name: "", active: true, floormap_id: null }); // Reset the form
     };
 
     return (
@@ -52,37 +51,20 @@ function AddAssetForm({ onAddAsset, closeModal }) {
                 </label>
             </div>
 
+            {/* Active toggle field */}
             <div className="add-asset-form__input-group">
-                <input
-                    id="x-coordinate"
+                <select
+                    id="active-select"
                     className="add-asset-form__input"
-                    type="number"
-                    value={newAsset.x}
-                    onChange={(e) =>
-                        setNewAsset({ ...newAsset, x: Number(e.target.value) })
-                    }
+                    value={newAsset.active ? "Active" : "Inactive"}
+                    onChange={(e) => setNewAsset({ ...newAsset, active: e.target.value === "Active" })}
                     required
-                    placeholder=" "
-                />
-                <label className="add-asset-form__placeholder" htmlFor="x-coordinate">
-                    X Coordinate
-                </label>
-            </div>
-
-            <div className="add-asset-form__input-group">
-                <input
-                    id="y-coordinate"
-                    className="add-asset-form__input"
-                    type="number"
-                    value={newAsset.y}
-                    onChange={(e) =>
-                        setNewAsset({ ...newAsset, y: Number(e.target.value) })
-                    }
-                    required
-                    placeholder=" "
-                />
-                <label className="add-asset-form__placeholder" htmlFor="y-coordinate">
-                    Y Coordinate
+                >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+                <label className="add-asset-form__placeholder" htmlFor="active-select">
+                    Active
                 </label>
             </div>
 

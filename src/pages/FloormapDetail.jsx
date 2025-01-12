@@ -1,123 +1,129 @@
-import React, { useEffect, useState } from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import ReactSelect from "react-select";
+import {useNavigate, useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
 import {FloorMapService} from "../services/floormapService.js";
+import AssetSimulationService from "../services/assetSimulationService.js";
 
 function FloormapDetail() {
     const { floormapId } = useParams();
     const navigate = useNavigate();
     const [assets, setAssets] = useState([]);
-    const floormapWidth = 500; // Image width
-    const floormapHeight = 300; // Image height
-    const movementSpeed = 5; // Speed of asset movement (in pixels)
+    const [activeAsset, setActiveAsset] = useState(null);
+    const [zoom, setZoom] = useState(1); // Zoom level
+    const [position, setPosition] = useState({ x: 0, y: 0 }); // Pan position
+    const [isDragging, setIsDragging] = useState(false); // Drag state
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 }); // Drag start position
 
     useEffect(() => {
-        // Generate assets based on floormapId
-        const generateAssets = (floormapId) => {
-            let assets = [];
-            if (floormapId === "1") {
-                assets = [
-                    { id: 1, x: 50, y: 50 },
-                    { id: 2, x: 100, y: 150 },
-                    { id: 3, x: 200, y: 100 },
-                ];
-            } else if (floormapId === "2") {
-                assets = [
-                    { id: 4, x: 100, y: 50 },
-                    { id: 5, x: 150, y: 200 },
-                    { id: 6, x: 250, y: 150 },
-                ];
+        FloorMapService.getFloorMapById(floormapId).then((floormap) => {
+            if (!floormap) {
+                navigate("/floormaps");
+                return;
             }
+            let assetSimulationService = new AssetSimulationService(floormapId, floormap.width, floormap.height, 5);
+            assetSimulationService.startSimulation(setAssets);
+        });
+    }, []);
 
-            // Return assets with the floormap ID attached
-            return assets.map((asset) => ({
-                ...asset,
-                floormapId: parseInt(floormapId),
-            }));
-        };
-
-        // Initialize the assets based on the floormapId
-        const initialAssets = generateAssets(floormapId);
-        setAssets(initialAssets);
-
-        // Function to simulate asset movement
-        const moveAssets = () => {
-            setAssets((prevAssets) => {
-                return prevAssets.map((asset) => {
-                    // Random movement in both x and y directions
-                    const newX = asset.x + (Math.random() * movementSpeed * 2 - movementSpeed);
-                    const newY = asset.y + (Math.random() * movementSpeed * 2 - movementSpeed);
-
-                    // Ensure assets stay within the bounds of the floormap
-                    const clampedX = Math.min(Math.max(newX, 0), floormapWidth - 10); // 10px for the asset size
-                    const clampedY = Math.min(Math.max(newY, 0), floormapHeight - 10); // 10px for the asset size
-
-                    return {
-                        ...asset,
-                        x: clampedX,
-                        y: clampedY,
-                    };
+    // Follow the active asset when its position updates
+    useEffect(() => {
+        if (activeAsset) {
+            const currentAsset = assets.find((asset) => asset.id === activeAsset.id);
+            if (currentAsset) {
+                setPosition({
+                    x: -currentAsset.x * zoom + 400, // Center horizontally
+                    y: -currentAsset.y * zoom + 300, // Center vertically
                 });
-            });
-        };
-
-        // Set an interval to move assets every 100ms
-        const intervalId = setInterval(moveAssets, 100);
-
-        // Cleanup on component unmount
-        return () => clearInterval(intervalId);
-    }, [floormapId]);
-
-    const handleDeleteClick = async () => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this floor map?"
-        );
-        if (confirmed) {
-            try {
-                await FloorMapService.deleteFloorMap(floormapId);
-                alert("Floor map deleted successfully!");
-                navigate("/home");  // Navigate to the HomePage after deletion
-            } catch (error) {
-                alert("Failed to delete floor map. Please try again.");
             }
         }
+    }, [assets, activeAsset, zoom]);
+
+    const assetOptions = assets.map((asset) => ({
+        value: asset.id,
+        label: `Asset ${asset.id}`,
+        asset,
+    }));
+
+    const handleAssetSelect = (selectedOption) => {
+        setActiveAsset(selectedOption.asset);
     };
 
     return (
-        <div>
+        <div
+            className="floormap-detail"
+            onMouseMove={(e) =>
+                isDragging &&
+                setPosition({
+                    x: e.clientX - dragStart.x,
+                    y: e.clientY - dragStart.y,
+                })
+            }
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
+            style={{ userSelect: "none", overflow: "hidden" }}
+        >
             <h2>Floormap Detail for {floormapId}</h2>
+            <ReactSelect
+                options={assetOptions}
+                onChange={handleAssetSelect}
+                placeholder="Select an Asset"
+                styles={{ container: (base) => ({ ...base, marginBottom: "10px", width: "300px" }) }}
+            />
             <div
+                className="floormap-container"
                 style={{
+                    width: "800px",
+                    height: "600px",
+                    overflow: "hidden",
                     position: "relative",
-                    width: `${floormapWidth}px`,
-                    height: `${floormapHeight}px`,
-                    border: "1px solid black",
-                    backgroundImage: `url('/mnt/data/image.png')`, // Background image path
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
+                    border: "1px solid #ccc",
+                    cursor: isDragging ? "grabbing" : "grab",
+                }}
+                onMouseDown={(e) => {
+                    setIsDragging(true);
+                    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
                 }}
             >
-                {/* Render assets */}
+                <img
+                    src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
+                    alt="Floor Map"
+                    draggable={false}
+                    style={{
+                        position: "absolute",
+                        top: position.y,
+                        left: position.x,
+                        transform: `scale(${zoom})`,
+                        transformOrigin: "center",
+                    }}
+                />
                 {assets.map((asset) => (
                     <div
                         key={asset.id}
+                        className="asset"
                         style={{
                             position: "absolute",
-                            top: `${asset.y}px`,  // Directly use asset's y position
-                            left: `${asset.x}px`, // Directly use asset's x position
+                            transform: `translate(${asset.x * zoom + position.x}px, ${asset.y * zoom + position.y}px)`,
                             width: "10px",
                             height: "10px",
                             backgroundColor: "red",
                             borderRadius: "50%",
-                            transform: "translate(-50%, -50%)", // Centers the asset
                         }}
-                        title={`Asset ID: ${asset.id}, FloorMap ID: ${asset.floormapId}`}
-                    ></div>
+                        title={`Asset ID: ${asset.id}`}
+                    >
+                        <div className="name-tag">{asset.id}</div>
+                    </div>
                 ))}
             </div>
-            <button onClick={handleDeleteClick}>Delete Floor Map</button>
-            <Link to={`/zone-editing/${floormapId}`} style={{ marginLeft: "10px" }}>
-                <button>Edit Zones</button>
-            </Link>
+            {activeAsset && (
+                <div className="dialog">
+                    <h3>Asset Details</h3>
+                    <p>ID: {activeAsset.id}</p>
+                    <p>X: {activeAsset.x}</p>
+                    <p>Y: {activeAsset.y}</p>
+                    <p>FloorMap ID: {floormapId}</p>
+                    <button onClick={() => setActiveAsset(null)}>Close</button>
+                </div>
+            )}
         </div>
     );
 }
