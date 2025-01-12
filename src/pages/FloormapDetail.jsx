@@ -55,12 +55,6 @@ function FloormapDetail() {
             style={{ userSelect: "none", overflow: "hidden" }} // Disable text selection while dragging
         >
             <h2>Floormap Detail for {floormapId}</h2>
-            <div style={{ marginBottom: "10px" }}>
-                <button onClick={handleZoomIn}>Zoom In (+)</button>
-                <button onClick={handleZoomOut} style={{ marginLeft: "5px" }}>
-                    Zoom Out (-)
-                </button>
-            </div>
             <div
                 className="floormap-container"
                 style={{
@@ -92,13 +86,11 @@ function FloormapDetail() {
                         className="asset"
                         style={{
                             position: "absolute",
-                            top: `${asset.y * zoom + position.y}px`,
-                            left: `${asset.x * zoom + position.x}px`,
+                            transform: `translate(${asset.x * zoom + position.x}px, ${asset.y * zoom + position.y}px)`,
                             width: "10px",
                             height: "10px",
                             backgroundColor: "red",
                             borderRadius: "50%",
-                            transform: "translate(-50%, -50%)",
                         }}
                         title={`Asset ID: ${asset.id}, FloorMap ID: ${floormapId}`}
                         onClick={() => setActiveAsset(asset)}
@@ -106,6 +98,7 @@ function FloormapDetail() {
                         <div className="name-tag">{asset.id}</div>
                     </div>
                 ))}
+
             </div>
             {activeAsset && (
                 <div className="dialog">

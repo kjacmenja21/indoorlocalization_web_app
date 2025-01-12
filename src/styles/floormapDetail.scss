@@ -7,10 +7,8 @@
   }
 
   .asset {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    z-index: 2;
+    transition: transform 0.1s linear;
+
 
     &.circle { // Apply circle styles directly to the asset
       width: 10px;
