@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import AssetSimulationService from "../services/assetSimulationService.js";
+import ReactSelect from "react-select";
+import {useNavigate, useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
 import {FloorMapService} from "../services/floormapService.js";
+import AssetSimulationService from "../services/assetSimulationService.js";
 
 function FloormapDetail() {
     const { floormapId } = useParams();
@@ -22,39 +23,52 @@ function FloormapDetail() {
             let assetSimulationService = new AssetSimulationService(floormapId, floormap.width, floormap.height, 5);
             assetSimulationService.startSimulation(setAssets);
         });
-
     }, []);
 
-    const handleZoomIn = () => setZoom((prevZoom) => Math.min(prevZoom + 0.1, 3)); // Max zoom: 3x
-    const handleZoomOut = () => setZoom((prevZoom) => Math.max(prevZoom - 0.1, 0.5)); // Min zoom: 0.5x
-
-    const handleMouseDown = (e) => {
-        setIsDragging(true);
-        setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-    };
-
-    const handleMouseMove = (e) => {
-        if (isDragging) {
-            setPosition({
-                x: e.clientX - dragStart.x,
-                y: e.clientY - dragStart.y,
-            });
+    // Follow the active asset when its position updates
+    useEffect(() => {
+        if (activeAsset) {
+            const currentAsset = assets.find((asset) => asset.id === activeAsset.id);
+            if (currentAsset) {
+                setPosition({
+                    x: -currentAsset.x * zoom + 400, // Center horizontally
+                    y: -currentAsset.y * zoom + 300, // Center vertically
+                });
+            }
         }
-    };
+    }, [assets, activeAsset, zoom]);
 
-    const handleMouseUp = () => {
-        setIsDragging(false);
+    const assetOptions = assets.map((asset) => ({
+        value: asset.id,
+        label: `Asset ${asset.id}`,
+        asset,
+    }));
+
+    const handleAssetSelect = (selectedOption) => {
+        setActiveAsset(selectedOption.asset);
     };
 
     return (
         <div
             className="floormap-detail"
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp} // Stops dragging if the user leaves the viewport
-            style={{ userSelect: "none", overflow: "hidden" }} // Disable text selection while dragging
+            onMouseMove={(e) =>
+                isDragging &&
+                setPosition({
+                    x: e.clientX - dragStart.x,
+                    y: e.clientY - dragStart.y,
+                })
+            }
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
+            style={{ userSelect: "none", overflow: "hidden" }}
         >
             <h2>Floormap Detail for {floormapId}</h2>
+            <ReactSelect
+                options={assetOptions}
+                onChange={handleAssetSelect}
+                placeholder="Select an Asset"
+                styles={{ container: (base) => ({ ...base, marginBottom: "10px", width: "300px" }) }}
+            />
             <div
                 className="floormap-container"
                 style={{
@@ -65,19 +79,21 @@ function FloormapDetail() {
                     border: "1px solid #ccc",
                     cursor: isDragging ? "grabbing" : "grab",
                 }}
-                onMouseDown={handleMouseDown}
+                onMouseDown={(e) => {
+                    setIsDragging(true);
+                    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+                }}
             >
                 <img
                     src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
                     alt="Floor Map"
-                    draggable={false} // Prevent default image dragging
+                    draggable={false}
                     style={{
                         position: "absolute",
                         top: position.y,
                         left: position.x,
                         transform: `scale(${zoom})`,
                         transformOrigin: "center",
-                        cursor: "move",
                     }}
                 />
                 {assets.map((asset) => (
@@ -92,13 +108,11 @@ function FloormapDetail() {
                             backgroundColor: "red",
                             borderRadius: "50%",
                         }}
-                        title={`Asset ID: ${asset.id}, FloorMap ID: ${floormapId}`}
-                        onClick={() => setActiveAsset(asset)}
+                        title={`Asset ID: ${asset.id}`}
                     >
                         <div className="name-tag">{asset.id}</div>
                     </div>
                 ))}
-
             </div>
             {activeAsset && (
                 <div className="dialog">
@@ -110,9 +124,6 @@ function FloormapDetail() {
                     <button onClick={() => setActiveAsset(null)}>Close</button>
                 </div>
             )}
-            <Link to={`/zone-editing/${floormapId}`} style={{ marginTop: "10px" }}>
-                <button>Edit Zones</button>
-            </Link>
         </div>
     );
 }
