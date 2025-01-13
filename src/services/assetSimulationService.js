@@ -29,8 +29,13 @@ class AssetSimulationService {
 
     updatePositions() {
         this.assets = this.assets.map((asset) => {
-            let newX = asset.x + this.movementSpeed * asset.direction;
+            if(asset.id === 1) {
 
+                return { ...asset, x: asset.x };
+
+            }
+
+            let newX = asset.x + this.movementSpeed * asset.direction;
             if (newX <= 0 || newX >= this.floormapWidth - 10) {
                 asset.direction *= -1;
                 newX = Math.min(Math.max(newX, 0), this.floormapWidth - 10);

@@ -11,6 +11,7 @@ import PrivateRoute from "./core/guard/privateRoute.jsx";
 import AssetDetailPage from "./pages/AssetDetailPage.jsx";
 import FloormapDetail from "./pages/FloormapDetail.jsx";
 import ZoneEditing from "./pages/zone-editing/ZoneEditingPage.jsx";
+import HeatMapPage from "./pages/report-pages/HeatMapPage.jsx";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/assets/:id" element={<PrivateRoute element={AssetDetailPage} />} />
           <Route path="/report" element={<PrivateRoute element={ReportPage} />} />
           <Route path="/zone-editing/:floormapId" element={<PrivateRoute element={ZoneEditing} />} />
+          <Route path="/report/heatmap" element={<PrivateRoute element={HeatMapPage} />} />
         </Routes>
       </Layout>
     </div>
