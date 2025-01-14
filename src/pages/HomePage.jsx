@@ -60,7 +60,7 @@ function HomePage() {
                   />
                   <p>{floormap.name}</p>
                   <button
-                    className="floormap-button"
+                    className="btn"
                     onClick={() => handleFloormapClick(floormap.id)}
                   >
                     View Details

@@ -1,131 +1,42 @@
-import ReactSelect from "react-select";
-import {useNavigate, useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
-import {FloorMapService} from "../services/floormapService.js";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { FloorMapService } from "../services/floormapService.js";
 import AssetSimulationService from "../services/assetSimulationService.js";
+import FloormapDisplay from "../components/FloormapDisplay/FloormapDisplay.jsx";
 
 function FloormapDetail() {
-    const { floormapId } = useParams();
-    const navigate = useNavigate();
-    const [assets, setAssets] = useState([]);
-    const [activeAsset, setActiveAsset] = useState(null);
-    const [zoom, setZoom] = useState(1); // Zoom level
-    const [position, setPosition] = useState({ x: 0, y: 0 }); // Pan position
-    const [isDragging, setIsDragging] = useState(false); // Drag state
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 }); // Drag start position
+  const { floormapId } = useParams();
+  const navigate = useNavigate();
+  const [assets, setAssets] = useState([]);
 
-    useEffect(() => {
-        FloorMapService.getFloorMapById(floormapId).then((floormap) => {
-            if (!floormap) {
-                navigate("/floormaps");
-                return;
-            }
-            let assetSimulationService = new AssetSimulationService(floormapId, floormap.width, floormap.height, 5);
-            assetSimulationService.startSimulation(setAssets);
-        });
-    }, []);
+  useEffect(() => {
+    FloorMapService.getFloorMapById(floormapId).then((floormap) => {
+      if (!floormap) {
+        navigate("/floormaps");
+        return;
+      }
+      let assetSimulationService = new AssetSimulationService(
+        floormapId,
+        floormap.width,
+        floormap.height,
+        5
+      );
+      assetSimulationService.startSimulation(setAssets);
+    });
+  }, [floormapId, navigate]);
 
-    // Follow the active asset when its position updates
-    useEffect(() => {
-        if (activeAsset) {
-            const currentAsset = assets.find((asset) => asset.id === activeAsset.id);
-            if (currentAsset) {
-                setPosition({
-                    x: -currentAsset.x * zoom + 400, // Center horizontally
-                    y: -currentAsset.y * zoom + 300, // Center vertically
-                });
-            }
-        }
-    }, [assets, activeAsset, zoom]);
+  const handleEditZone = () => {
+    navigate(`/zone-editing/${floormapId}`);
+  };
 
-    const assetOptions = assets.map((asset) => ({
-        value: asset.id,
-        label: `Asset ${asset.id}`,
-        asset,
-    }));
-
-    const handleAssetSelect = (selectedOption) => {
-        setActiveAsset(selectedOption.asset);
-    };
-
-    return (
-        <div
-            className="floormap-detail"
-            onMouseMove={(e) =>
-                isDragging &&
-                setPosition({
-                    x: e.clientX - dragStart.x,
-                    y: e.clientY - dragStart.y,
-                })
-            }
-            onMouseUp={() => setIsDragging(false)}
-            onMouseLeave={() => setIsDragging(false)}
-            style={{ userSelect: "none", overflow: "hidden" }}
-        >
-            <h2>Floormap Detail for {floormapId}</h2>
-            <ReactSelect
-                options={assetOptions}
-                onChange={handleAssetSelect}
-                placeholder="Select an Asset"
-                styles={{ container: (base) => ({ ...base, marginBottom: "10px", width: "300px" }) }}
-            />
-            <div
-                className="floormap-container"
-                style={{
-                    width: "800px",
-                    height: "600px",
-                    overflow: "hidden",
-                    position: "relative",
-                    border: "1px solid #ccc",
-                    cursor: isDragging ? "grabbing" : "grab",
-                }}
-                onMouseDown={(e) => {
-                    setIsDragging(true);
-                    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-                }}
-            >
-                <img
-                    src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
-                    alt="Floor Map"
-                    draggable={false}
-                    style={{
-                        position: "absolute",
-                        top: position.y,
-                        left: position.x,
-                        transform: `scale(${zoom})`,
-                        transformOrigin: "center",
-                    }}
-                />
-                {assets.map((asset) => (
-                    <div
-                        key={asset.id}
-                        className="asset"
-                        style={{
-                            position: "absolute",
-                            transform: `translate(${asset.x * zoom + position.x}px, ${asset.y * zoom + position.y}px)`,
-                            width: "10px",
-                            height: "10px",
-                            backgroundColor: "red",
-                            borderRadius: "50%",
-                        }}
-                        title={`Asset ID: ${asset.id}`}
-                    >
-                        <div className="name-tag">{asset.id}</div>
-                    </div>
-                ))}
-            </div>
-            {activeAsset && (
-                <div className="dialog">
-                    <h3>Asset Details</h3>
-                    <p>ID: {activeAsset.id}</p>
-                    <p>X: {activeAsset.x}</p>
-                    <p>Y: {activeAsset.y}</p>
-                    <p>FloorMap ID: {floormapId}</p>
-                    <button onClick={() => setActiveAsset(null)}>Close</button>
-                </div>
-            )}
-        </div>
-    );
+  return (
+    <div>
+      <FloormapDisplay floormapId={floormapId} assets={assets} />
+      <button onClick={handleEditZone} style={{ marginTop: "20px" }}>
+        Edit Zones
+      </button>
+    </div>
+  );
 }
 
 export default FloormapDetail;
