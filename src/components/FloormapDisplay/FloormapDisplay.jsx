@@ -9,13 +9,28 @@ function FloormapDisplay({ floormapId, assets }) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
+  const containerSize = { width: 800, height: 600 }; // Dimenzije kontejnera
+  const imageSize = { width: 1600, height: 1100 }; // Dimenzije slike
+
   useEffect(() => {
     if (activeAsset) {
       const currentAsset = assets.find((asset) => asset.id === activeAsset.id);
       if (currentAsset) {
         setPosition({
-          x: -currentAsset.x * zoom + 400,
-          y: -currentAsset.y * zoom + 300,
+          x: Math.min(
+            Math.max(
+              -currentAsset.x * zoom + containerSize.width / 2,
+              -imageSize.width * zoom + containerSize.width
+            ),
+            0
+          ),
+          y: Math.min(
+            Math.max(
+              -currentAsset.y * zoom + containerSize.height / 2,
+              -imageSize.height * zoom + containerSize.height
+            ),
+            0
+          ),
         });
       }
     }
@@ -31,16 +46,29 @@ function FloormapDisplay({ floormapId, assets }) {
     setActiveAsset(selectedOption.asset);
   };
 
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
+
+      // Ograničenje pozicije
+      const limitedX = Math.min(
+        Math.max(newX, -imageSize.width * zoom + containerSize.width),
+        0
+      );
+      const limitedY = Math.min(
+        Math.max(newY, -imageSize.height * zoom + containerSize.height),
+        0
+      );
+
+      setPosition({ x: limitedX, y: limitedY });
+    }
+  };
+
   return (
     <div
       className="floormap-detail"
-      onMouseMove={(e) =>
-        isDragging &&
-        setPosition({
-          x: e.clientX - dragStart.x,
-          y: e.clientY - dragStart.y,
-        })
-      }
+      onMouseMove={handleMouseMove}
       onMouseUp={() => setIsDragging(false)}
       onMouseLeave={() => setIsDragging(false)}
       style={{ userSelect: "none", overflow: "hidden" }}
@@ -61,8 +89,8 @@ function FloormapDisplay({ floormapId, assets }) {
       <div
         className="floormap-container"
         style={{
-          width: "800px",
-          height: "600px",
+          width: `${containerSize.width}px`,
+          height: `${containerSize.height}px`,
           overflow: "hidden",
           position: "relative",
           border: "1px solid #ccc",
