@@ -18,4 +18,8 @@ export const API_PATHS = {
 
   /* ZONES */
     ZONES: "zones/",
+
+  /* ASSET POSITION HISTORY */
+  ASSETS_GET_POSITION_HISTORY: "asset-position/",
+
 };
