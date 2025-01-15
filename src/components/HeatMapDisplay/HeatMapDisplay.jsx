@@ -7,30 +7,28 @@ function HeatMapDisplay({ floormapId, heatmapData }) {
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const canvasRef = useRef(null);
 
-    const containerSize = { width: 800, height: 600 }; // Visible container size
-    const imageSize = { width: 1600, height: 1100 }; // Full image and canvas size
+    const containerSize = { width: 800, height: 600 };
+    const imageSize = { width: 1600, height: 1100 }; //TODO: Get image size from API
 
     useEffect(() => {
         if (heatmapData && canvasRef.current) {
             const canvas = canvasRef.current;
             const ctx = canvas.getContext("2d");
 
-            // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Apply transformations
             ctx.save();
             ctx.scale(zoom, zoom);
-            ctx.translate(position.x / zoom, position.y / zoom);
 
             // Draw heatmap
             heatmapData.forEach(({ positions }) => {
                 if (Array.isArray(positions) && positions.length > 0) {
                     positions.forEach(({ x, y, count }) => {
+                        // Normalize coordinates
                         const normalizedX = (x / imageSize.width) * imageSize.width;
                         const normalizedY = (y / imageSize.height) * imageSize.height;
 
-                        const radius = count * 10 / zoom; // Adjust radius for zoom
+                        const radius = count * 10 / zoom;
                         const gradient = ctx.createRadialGradient(
                             normalizedX,
                             normalizedY,
@@ -52,7 +50,8 @@ function HeatMapDisplay({ floormapId, heatmapData }) {
 
             ctx.restore();
         }
-    }, [heatmapData, zoom, position]);
+    }, [heatmapData, zoom]);
+
 
     const handleMouseMove = (e) => {
         if (isDragging) {
