@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function AssetMarkers({
+const AssetMarkers = ({
   assets,
   zoom,
   position,
@@ -8,7 +8,7 @@ function AssetMarkers({
   activeAsset,
   imageSize,
   containerSize,
-}) {
+}) => {
   const [draggingAsset, setDraggingAsset] = useState(null);
 
   const handleMouseDown = (e, asset) => {
@@ -81,6 +81,6 @@ function AssetMarkers({
       ))}
     </div>
   );
-}
+};
 
 export default AssetMarkers;
