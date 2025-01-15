@@ -71,6 +71,39 @@ function HeatMapPage() {
         setSelectedAssets([]);
     }
 
+    async function handleHeatMapGeneration() {
+        const historyOfAssetPositions = [];
+
+        const selectedAssetIds = await Promise.all(
+            selectedAssets.map(async (asset) => {
+                console.log("Asset ", asset)
+                const data = await AssetService.getAssetPositionHistory(
+                    asset.value,
+                    "2025-01-14T09:00:00",
+                    "2025-01-15T09:00:00"
+                );
+
+                const assetHistoryMap = data.reduce((acc, { x, y }) => {
+                    const key = `${x},${y}`;
+
+                    if (!acc[key]) {
+                        acc[key] = { x, y, count: 0 };
+                    }
+                    acc[key].count += 1;
+                    return acc;
+                }, {});
+
+                return {
+                    id: asset.value,
+                    positions: Object.values(assetHistoryMap),
+                };
+            })
+        );
+        historyOfAssetPositions.push(...selectedAssetIds);
+        console.log(historyOfAssetPositions);
+    }
+
+
     return (
         <div>
             <h1>Heatmap Page</h1>
@@ -100,6 +133,7 @@ function HeatMapPage() {
                     />
                 </div>
             )}
+            <button onClick={handleHeatMapGeneration}>Generate Heatmap Report</button>
         </div>
     );
 }
