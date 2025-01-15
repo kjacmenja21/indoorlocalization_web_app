@@ -122,7 +122,7 @@ function FloormapDisplay({ floormapId, assets }) {
           position={position}
           setActiveAsset={setActiveAsset}
           activeAsset={activeAsset}
-          floormapId={floormapId}
+          imageSize={imageSize} // Prosljeđujemo veličinu slike
         />
       </div>
     </div>
