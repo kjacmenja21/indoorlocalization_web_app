@@ -1,67 +1,78 @@
 import React, { useState, useEffect } from "react";
-import ReactSelect from "react-select";
+import AssetMarkers from "../AssetMarker/AssetMarker";
 
-function FloormapDisplay({ floormapId, assets }) {
-  const [activeAsset, setActiveAsset] = useState(null);
+function FloormapDisplay({ floormapId, assets, activeAsset, setActiveAsset }) {
+  //const [activeAsset, setActiveAssetState] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+  const containerSize = { width: 800, height: 600 }; // Dimenzije kontejnera
+  const imageSize = { width: 1600, height: 1100 }; // Dimenzije slike
+
+  // const setActiveAsset = useCallback((asset) => {
+  //   setActiveAssetState(asset);
+  // }, []);
 
   useEffect(() => {
     if (activeAsset) {
       const currentAsset = assets.find((asset) => asset.id === activeAsset.id);
       if (currentAsset) {
         setPosition({
-          x: -currentAsset.x * zoom + 400,
-          y: -currentAsset.y * zoom + 300,
+          x: Math.min(
+            Math.max(
+              -currentAsset.x * zoom + containerSize.width / 2,
+              -imageSize.width * zoom + containerSize.width
+            ),
+            0
+          ),
+          y: Math.min(
+            Math.max(
+              -currentAsset.y * zoom + containerSize.height / 2,
+              -imageSize.height * zoom + containerSize.height
+            ),
+            0
+          ),
         });
       }
     }
   }, [assets, activeAsset, zoom]);
 
-  const assetOptions = assets.map((asset) => ({
-    value: asset.id,
-    label: `Asset ${asset.id}`,
-    asset,
-  }));
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
 
-  const handleAssetSelect = (selectedOption) => {
-    setActiveAsset(selectedOption.asset);
+      // Ograničenje pozicije
+      const limitedX = Math.min(
+        Math.max(newX, -imageSize.width * zoom + containerSize.width),
+        0
+      );
+      const limitedY = Math.min(
+        Math.max(newY, -imageSize.height * zoom + containerSize.height),
+        0
+      );
+
+      setPosition({ x: limitedX, y: limitedY });
+    }
   };
 
   return (
     <div
       className="floormap-detail"
-      onMouseMove={(e) =>
-        isDragging &&
-        setPosition({
-          x: e.clientX - dragStart.x,
-          y: e.clientY - dragStart.y,
-        })
-      }
+      onMouseMove={handleMouseMove}
       onMouseUp={() => setIsDragging(false)}
       onMouseLeave={() => setIsDragging(false)}
       style={{ userSelect: "none", overflow: "hidden" }}
     >
       <h2>Floormap Detail for {floormapId}</h2>
-      <ReactSelect
-        options={assetOptions}
-        onChange={handleAssetSelect}
-        placeholder="Select an Asset"
-        styles={{
-          container: (base) => ({
-            ...base,
-            marginBottom: "10px",
-            width: "300px",
-          }),
-        }}
-      />
+      {/* <AssetSelector assets={assets} setActiveAsset={setActiveAsset} /> */}
       <div
         className="floormap-container"
         style={{
-          width: "800px",
-          height: "600px",
+          width: `${containerSize.width}px`,
+          height: `${containerSize.height}px`,
           overflow: "hidden",
           position: "relative",
           border: "1px solid #ccc",
@@ -87,36 +98,15 @@ function FloormapDisplay({ floormapId, assets }) {
             transformOrigin: "center",
           }}
         />
-        {assets.map((asset) => (
-          <div
-            key={asset.id}
-            className="asset"
-            style={{
-              position: "absolute",
-              transform: `translate(${asset.x * zoom + position.x}px, ${
-                asset.y * zoom + position.y
-              }px)`,
-              width: "10px",
-              height: "10px",
-              backgroundColor: "red",
-              borderRadius: "50%",
-            }}
-            title={`Asset ID: ${asset.id}`}
-          >
-            <div className="name-tag">{asset.id}</div>
-          </div>
-        ))}
+        <AssetMarkers
+          assets={assets}
+          zoom={zoom}
+          position={position}
+          setActiveAsset={setActiveAsset}
+          activeAsset={activeAsset}
+          imageSize={imageSize} // Prosljeđujemo veličinu slike
+        />
       </div>
-      {activeAsset && (
-        <div className="dialog">
-          <h3>Asset Details</h3>
-          <p>ID: {activeAsset.id}</p>
-          <p>X: {activeAsset.x}</p>
-          <p>Y: {activeAsset.y}</p>
-          <p>FloorMap ID: {floormapId}</p>
-          <button onClick={() => setActiveAsset(null)}>Close</button>
-        </div>
-      )}
     </div>
   );
 }
