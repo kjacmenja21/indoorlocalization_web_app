@@ -1,17 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 
-function HeatMapDisplay({
-                             floormapId,
-                             heatmapData
-                         }) {
+function HeatMapDisplay({ floormapId, heatmapData }) {
     const [zoom, setZoom] = useState(1);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const canvasRef = useRef(null);
 
-    const containerSize = { width: 800, height: 600 };
-    const imageSize = { width: 1600, height: 1100 };
+    const containerSize = { width: 800, height: 600 }; // Visible container size
+    const imageSize = { width: 1600, height: 1100 }; // Full image and canvas size
 
     useEffect(() => {
         if (heatmapData && canvasRef.current) {
@@ -21,17 +18,19 @@ function HeatMapDisplay({
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Apply transformations
+            ctx.save();
+            ctx.scale(zoom, zoom);
+            ctx.translate(position.x / zoom, position.y / zoom);
+
             // Draw heatmap
             heatmapData.forEach(({ positions }) => {
-                // Check if positions array exists and has items
                 if (Array.isArray(positions) && positions.length > 0) {
                     positions.forEach(({ x, y, count }) => {
-                        // Normalize coordinates
-                        const normalizedX = (x / imageSize.width) * containerSize.width;
-                        const normalizedY = (y / imageSize.height) * containerSize.height;
+                        const normalizedX = (x / imageSize.width) * imageSize.width;
+                        const normalizedY = (y / imageSize.height) * imageSize.height;
 
-                        // Draw heatmap circle
-                        const radius = count * 10; // Scale radius based on count
+                        const radius = count * 10 / zoom; // Adjust radius for zoom
                         const gradient = ctx.createRadialGradient(
                             normalizedX,
                             normalizedY,
@@ -51,6 +50,7 @@ function HeatMapDisplay({
                 }
             });
 
+            ctx.restore();
         }
     }, [heatmapData, zoom, position]);
 
@@ -105,22 +105,28 @@ function HeatMapDisplay({
                     alt="Floor Map"
                     draggable={false}
                     style={{
+                        width: `${imageSize.width}px`,
+                        height: `${imageSize.height}px`,
                         position: "absolute",
                         top: position.y,
                         left: position.x,
                         transform: `scale(${zoom})`,
-                        transformOrigin: "center",
+                        transformOrigin: "top left",
                     }}
                 />
                 {/* Heatmap canvas */}
                 <canvas
                     ref={canvasRef}
-                    width={containerSize.width}
-                    height={containerSize.height}
+                    width={imageSize.width}
+                    height={imageSize.height}
                     style={{
                         position: "absolute",
-                        top: 0,
-                        left: 0,
+                        top: position.y,
+                        left: position.x,
+                        width: `${imageSize.width}px`,
+                        height: `${imageSize.height}px`,
+                        transform: `scale(${zoom})`,
+                        transformOrigin: "top left",
                         pointerEvents: "none",
                     }}
                 />
