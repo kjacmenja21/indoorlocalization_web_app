@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import ReactSelect from "react-select";
 import AssetMarkers from "../AssetMarker/AssetMarker";
 
-function FloormapDisplay({ floormapId, assets }) {
-  const [activeAsset, setActiveAsset] = useState(null);
+function FloormapDisplay({ floormapId, assets, activeAsset, setActiveAsset }) {
+  //const [activeAsset, setActiveAssetState] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -11,6 +10,10 @@ function FloormapDisplay({ floormapId, assets }) {
 
   const containerSize = { width: 800, height: 600 }; // Dimenzije kontejnera
   const imageSize = { width: 1600, height: 1100 }; // Dimenzije slike
+
+  // const setActiveAsset = useCallback((asset) => {
+  //   setActiveAssetState(asset);
+  // }, []);
 
   useEffect(() => {
     if (activeAsset) {
@@ -35,16 +38,6 @@ function FloormapDisplay({ floormapId, assets }) {
       }
     }
   }, [assets, activeAsset, zoom]);
-
-  const assetOptions = assets.map((asset) => ({
-    value: asset.id,
-    label: `Asset ${asset.id}`,
-    asset,
-  }));
-
-  const handleAssetSelect = (selectedOption) => {
-    setActiveAsset(selectedOption.asset);
-  };
 
   const handleMouseMove = (e) => {
     if (isDragging) {
@@ -74,18 +67,7 @@ function FloormapDisplay({ floormapId, assets }) {
       style={{ userSelect: "none", overflow: "hidden" }}
     >
       <h2>Floormap Detail for {floormapId}</h2>
-      <ReactSelect
-        options={assetOptions}
-        onChange={handleAssetSelect}
-        placeholder="Select an Asset"
-        styles={{
-          container: (base) => ({
-            ...base,
-            marginBottom: "10px",
-            width: "300px",
-          }),
-        }}
-      />
+      {/* <AssetSelector assets={assets} setActiveAsset={setActiveAsset} /> */}
       <div
         className="floormap-container"
         style={{
