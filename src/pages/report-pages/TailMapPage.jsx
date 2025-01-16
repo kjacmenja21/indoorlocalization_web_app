@@ -2,16 +2,14 @@ import React, { useEffect, useState } from "react";
 import ReactSelect from "react-select";
 import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
-import HeatMapDisplay from "../../components/HeatMapDisplay/HeatMapDisplay.jsx";
+import TailMapDisplay from "../../components/TailmapDisplay/TailmapDisplay.jsx";
 
-
-function HeatMapPage() {
+function TailMapPage() {
     const [floormaps, setFloormaps] = useState([]);
     const [selectedFloormap, setSelectedFloormap] = useState(null);
     const [assets, setAssets] = useState([]);
-    const [selectedAssets, setSelectedAssets] = useState([]);
-    const [heatmapData, setHeatmapData] = useState(null);
-    const [isHeatmapVisible, setIsHeatmapVisible] = useState(false);
+    const [selectedAsset, setSelectedAsset] = useState(null);
+    const [tailmapData, setTailmapData] = useState(null);
 
     useEffect(() => {
         const fetchFloormaps = async () => {
@@ -69,48 +67,28 @@ function HeatMapPage() {
 
     function handleFloormapSelect(selectedOption) {
         setSelectedFloormap(selectedOption.floormap);
-        setSelectedAssets([]);
-        setHeatmapData(null);
-        setIsHeatmapVisible(false);
+        setSelectedAsset(null);
+        setTailmapData(null);
     }
 
-    async function handleHeatMapGeneration() {
-        const historyOfAssetPositions = [];
+    async function handleTailMapGeneration() {
+        if (!selectedAsset) return;
 
-        const selectedAssetIds = await Promise.all(
-            selectedAssets.map(async (asset) => {
-                const data = await AssetService.getAssetPositionHistory(
-                    asset.value,
-                    "2025-01-14T09:00:00",
-                    "2025-01-15T09:00:00"
-                );
-
-                const assetHistoryMap = data.reduce((acc, { x, y }) => {
-                    const key = `${x},${y}`;
-
-                    if (!acc[key]) {
-                        acc[key] = { x, y, count: 0 };
-                    }
-                    acc[key].count += 1;
-                    return acc;
-                }, {});
-
-                return {
-                    id: asset.value,
-                    positions: Object.values(assetHistoryMap),
-                };
-            })
-        );
-
-        historyOfAssetPositions.push(...selectedAssetIds);
-
-        setHeatmapData(historyOfAssetPositions);
-        setIsHeatmapVisible(true);
+        try {
+            const data = await AssetService.getAssetPositionHistory(
+                selectedAsset.value,
+                "2025-01-14T09:00:00",
+                "2025-01-15T09:00:00"
+            );
+            setTailmapData(data);
+        } catch (error) {
+            console.error("Error fetching tailmap data:", error.message);
+        }
     }
 
     return (
         <div>
-            <h1>Heatmap Page</h1>
+            <h1>Tailmap Page</h1>
             <div style={{ marginBottom: "20px", width: "300px" }}>
                 <label>Select a Floor Map:</label>
                 <ReactSelect
@@ -124,26 +102,25 @@ function HeatMapPage() {
             </div>
             {selectedFloormap && (
                 <div style={{ marginBottom: "20px", width: "300px" }}>
-                    <label>Select Assets:</label>
+                    <label>Select an Asset:</label>
                     <ReactSelect
                         options={assetOptions}
-                        isMulti
-                        value={selectedAssets}
-                        onChange={setSelectedAssets}
-                        placeholder="Select Assets..."
+                        value={selectedAsset}
+                        onChange={setSelectedAsset}
+                        placeholder="Select an Asset..."
                         styles={{
                             container: (base) => ({ ...base, width: "100%" }),
                         }}
                     />
                 </div>
             )}
-            <button onClick={handleHeatMapGeneration}>Generate Heatmap Report</button>
+            <button onClick={handleTailMapGeneration}>Generate Tailmap Report</button>
 
-            {isHeatmapVisible && heatmapData && (
-                <HeatMapDisplay floormapId={selectedFloormap.id} heatmapData={heatmapData} />
+            {tailmapData && (
+                <TailMapDisplay floormapId={selectedFloormap.id} tailmapData={tailmapData} />
             )}
         </div>
     );
 }
 
-export default HeatMapPage;
+export default TailMapPage;

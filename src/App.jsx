@@ -12,6 +12,7 @@ import AssetDetailPage from "./pages/AssetDetailPage.jsx";
 import FloormapDetail from "./pages/FloormapDetail.jsx";
 import ZoneEditing from "./pages/zone-editing/ZoneEditingPage.jsx";
 import HeatMapPage from "./pages/report-pages/HeatMapPage.jsx";
+import TailMapPage from "./pages/report-pages/TailMapPage.jsx";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/report" element={<PrivateRoute element={ReportPage} />} />
           <Route path="/zone-editing/:floormapId" element={<PrivateRoute element={ZoneEditing} />} />
           <Route path="/report/heatmap" element={<PrivateRoute element={HeatMapPage} />} />
+          <Route path="/report/tailmap" element={<PrivateRoute element={TailMapPage} />} />
         </Routes>
       </Layout>
     </div>
