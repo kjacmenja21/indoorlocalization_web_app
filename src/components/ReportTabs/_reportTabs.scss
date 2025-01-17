@@ -1,0 +1,119 @@
+.tabs {
+  &__container {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: auto;
+    position: relative;
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__list {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    &-item {
+      text-align: center;
+      flex: 1;
+
+      &-label {
+        cursor: pointer;
+        padding: 10px 0;
+        color: #aaa;
+        font-size: 18px;
+        font-weight: bold;
+        transition: color 0.3s;
+
+        &:hover {
+          color: #0095da;
+        }
+      }
+    }
+  }
+
+  &__slider {
+    position: relative;
+    height: 4px;
+    background: transparent;
+    margin-top: 10px;
+
+    &-indicator {
+      height: 4px;
+      background: #0095da;
+      width: 33%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: transform 0.3s;
+    }
+  }
+
+  &__content {
+    margin-top: 20px;
+
+    &-section {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+
+      &-header {
+        margin-bottom: 10px;
+        font-size: 20px;
+        color: #5b6162;
+      }
+    }
+  }
+
+  &--active {
+    color: #0095da;
+  }
+
+  &__input#tab1:checked
+    ~ .tabs__list
+    .tabs__list-item:nth-child(1)
+    .tabs__list-item-label,
+  &__input#tab2:checked
+    ~ .tabs__list
+    .tabs__list-item:nth-child(2)
+    .tabs__list-item-label,
+  &__input#tab3:checked
+    ~ .tabs__list
+    .tabs__list-item:nth-child(3)
+    .tabs__list-item-label {
+    color: #0095da;
+  }
+
+  &__input#tab1:checked ~ .tabs__slider .tabs__slider-indicator {
+    transform: translateX(0%);
+  }
+
+  &__input#tab2:checked ~ .tabs__slider .tabs__slider-indicator {
+    transform: translateX(100%);
+  }
+
+  &__input#tab3:checked ~ .tabs__slider .tabs__slider-indicator {
+    transform: translateX(200%);
+  }
+
+  &__input#tab1:checked ~ .tabs__content .tabs__content-section:nth-of-type(1),
+  &__input#tab2:checked ~ .tabs__content .tabs__content-section:nth-of-type(2),
+  &__input#tab3:checked ~ .tabs__content .tabs__content-section:nth-of-type(3) {
+    display: block;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

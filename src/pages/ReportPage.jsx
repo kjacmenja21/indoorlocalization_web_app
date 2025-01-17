@@ -1,20 +1,24 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import ReportTabs from "../components/ReportTabs/ReportTabs";
 
 function ReportPage() {
   return (
-      <div>
+    <>
+      {/* <div>
         <h1>Report</h1>
         <p>This is the Report page.</p>
 
         <Link to="/report/heatmap">
-            <button>Go to Heatmap</button>
+          <button>Go to Heatmap</button>
         </Link>
 
         <Link to="/report/tailmap">
-            <button>Go to Tailmap</button>
+          <button>Go to Tailmap</button>
         </Link>
-      </div>
+      </div> */}
+      <ReportTabs></ReportTabs>
+    </>
   );
 }
 
