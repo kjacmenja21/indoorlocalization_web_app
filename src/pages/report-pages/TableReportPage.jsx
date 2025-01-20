@@ -3,6 +3,7 @@ import ReactSelect from "react-select";
 import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import {ZoneService} from "../../services/zoneService.js";
+import TableReportDisplay from "../../components/TableReportDisplay/TableReportDisplay.jsx";
 
 function TableReportPage() {
     const [floormaps, setFloormaps] = useState([]);
@@ -133,7 +134,7 @@ function TableReportPage() {
 
             // Use the aggregated data for rendering or further processing
             console.log("Aggregated Data:", aggregatedData);
-
+            console.log("Selected Floormap:", selectedFloormap);
             setTableReportData(aggregatedData);
             setIsTableReportVisible(true);
         } catch (error) {
@@ -175,7 +176,7 @@ function TableReportPage() {
             <button onClick={handleTableReportGeneration}>Generate Table Report</button>
 
             {isTableReportVisible && tableReportData && (
-                <h1>Eyooo</h1>
+                <TableReportDisplay selectedFloormap={selectedFloormap} tableReportData={tableReportData} />
             )}
         </div>
     );
