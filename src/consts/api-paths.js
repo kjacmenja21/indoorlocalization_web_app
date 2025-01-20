@@ -22,4 +22,6 @@ export const API_PATHS = {
   /* ASSET POSITION HISTORY */
   ASSETS_GET_POSITION_HISTORY: "asset-position/",
 
+  /* ASSET ZONE HISTORY */
+  ASSETS_GET_ZONE_HISTORY: "asset-zone-history/",
 };
