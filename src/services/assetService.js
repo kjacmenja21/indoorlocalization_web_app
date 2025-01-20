@@ -149,4 +149,24 @@ export const AssetService = {
         }
     },
 
+    getAssetZoneHistory: async (assetId, startDate, endDate) => {
+        try {
+            console.log("Asset id: ", assetId);
+            console.log("Start date: ", startDate);
+            console.log("End date: ", endDate);
+            const response = await axiosInstance.get(`${API_PATHS.ASSETS_GET_ZONE_HISTORY}`, {
+                params: {
+                    assetId: assetId,
+                    startDate: startDate,
+                    endDate: endDate,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch asset position history';
+            console.error(`Error fetching asset position history: ${errorMessage}`);
+            throw new Error(errorMessage);
+        }
+    },
+
 };
