@@ -2,6 +2,7 @@ import React from "react";
 import "./_reportTabs.scss";
 import TailmapReport from "../TailmapReport/TailmapReport";
 import HeatmapReport from "../HeatmapReport/HeatmapReport";
+import TableReport from "../TableReport/TableReport";
 
 const Tabs = () => {
   return (
@@ -55,15 +56,13 @@ const Tabs = () => {
       </div>
       <div className="tabs__content">
         <section className="tabs__content-section">
-          <h2 className="tabs__content-section-header">HeatMap Report</h2>
           <HeatmapReport />
         </section>
         <section className="tabs__content-section">
-          <h2 className="tabs__content-section-header">TailMap Report</h2>
           <TailmapReport />
         </section>
         <section className="tabs__content-section">
-          <h2 className="tabs__content-section-header">Table Report</h2>
+          <TableReport />
         </section>
       </div>
     </div>

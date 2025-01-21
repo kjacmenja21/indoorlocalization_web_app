@@ -11,7 +11,6 @@ import PrivateRoute from "./core/guard/privateRoute.jsx";
 import AssetDetailPage from "./pages/AssetDetailPage.jsx";
 import FloormapDetail from "./pages/FloormapDetail.jsx";
 import ZoneEditing from "./pages/zone-editing/ZoneEditingPage.jsx";
-import TableReportPage from "./pages/report-pages/TableReportPage.jsx";
 
 function App() {
   return (
@@ -40,18 +39,6 @@ function App() {
           <Route
             path="/zone-editing/:floormapId"
             element={<PrivateRoute element={ZoneEditing} />}
-          />
-          {/* <Route
-            path="/report/heatmap"
-            element={<PrivateRoute element={HeatMapPage} />}
-          /> */}
-          {/* <Route
-            path="/report/tailmap"
-            element={<PrivateRoute element={TailMapPage} />}
-          /> */}
-          <Route
-            path="/report/table-report"
-            element={<PrivateRoute element={TableReportPage} />}
           />
         </Routes>
       </Layout>
