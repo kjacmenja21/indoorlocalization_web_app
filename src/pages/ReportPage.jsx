@@ -12,9 +12,6 @@ function ReportPage() {
         <Link to="/report/heatmap">
           <button>Go to Heatmap</button>
         </Link>
-        <Link to="/report/tailmap">
-          <button>Go to Tailmap</button>
-        </Link>
       </div>
       <ReportTabs></ReportTabs>
 

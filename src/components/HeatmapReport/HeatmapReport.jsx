@@ -2,14 +2,15 @@ import React, { useEffect, useState, useRef } from "react";
 import ReactSelect from "react-select";
 import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
-import "./_tailmapReport.scss";
+import "./_heatmapReport.scss";
 
-function TailmapReport() {
+function HeatmapReport() {
   const [floormaps, setFloormaps] = useState([]);
   const [selectedFloormap, setSelectedFloormap] = useState(null);
   const [assets, setAssets] = useState([]);
-  const [selectedAsset, setSelectedAsset] = useState(null);
-  const [tailmapData, setTailmapData] = useState(null);
+  const [selectedAssets, setSelectedAssets] = useState([]);
+  const [heatmapData, setHeatmapData] = useState(null);
+  const [isHeatmapVisible, setIsHeatmapVisible] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -80,27 +81,47 @@ function TailmapReport() {
 
   function handleFloormapSelect(selectedOption) {
     setSelectedFloormap(selectedOption.floormap);
-    setSelectedAsset(null);
-    setTailmapData(null);
+    setSelectedAssets([]);
+    setHeatmapData(null);
+    setIsHeatmapVisible(false);
   }
 
-  async function handleTailMapGeneration() {
-    if (!selectedAsset) return;
+  async function handleHeatMapGeneration() {
+    const historyOfAssetPositions = [];
 
-    try {
-      const data = await AssetService.getAssetPositionHistory(
-        selectedAsset.value,
-        "2025-01-14T09:00:00",
-        "2025-01-15T09:00:00"
-      );
-      setTailmapData(data);
-    } catch (error) {
-      console.error("Error fetching tailmap data:", error.message);
-    }
+    const selectedAssetIds = await Promise.all(
+      selectedAssets.map(async (asset) => {
+        const data = await AssetService.getAssetPositionHistory(
+          asset.value,
+          "2025-01-14T09:00:00",
+          "2025-01-15T09:00:00"
+        );
+
+        const assetHistoryMap = data.reduce((acc, { x, y }) => {
+          const key = `${x},${y}`;
+
+          if (!acc[key]) {
+            acc[key] = { x, y, count: 0 };
+          }
+          acc[key].count += 1;
+          return acc;
+        }, {});
+
+        return {
+          id: asset.value,
+          positions: Object.values(assetHistoryMap),
+        };
+      })
+    );
+
+    historyOfAssetPositions.push(...selectedAssetIds);
+
+    setHeatmapData(historyOfAssetPositions);
+    setIsHeatmapVisible(true);
   }
 
   useEffect(() => {
-    if (tailmapData && canvasRef.current) {
+    if (heatmapData && canvasRef.current) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
 
@@ -109,25 +130,35 @@ function TailmapReport() {
       ctx.save();
       ctx.scale(zoom, zoom);
 
-      ctx.strokeStyle = "rgba(0, 0, 255, 0.8)";
-      ctx.lineWidth = 2 / zoom;
+      heatmapData.forEach(({ positions }) => {
+        if (Array.isArray(positions) && positions.length > 0) {
+          positions.forEach(({ x, y, count }) => {
+            const normalizedX = (x / imageSize.width) * imageSize.width;
+            const normalizedY = (y / imageSize.height) * imageSize.height;
 
-      ctx.beginPath();
-      tailmapData.forEach(({ x, y }, index) => {
-        const normalizedX = (x / imageSize.width) * imageSize.width;
-        const normalizedY = (y / imageSize.height) * imageSize.height;
+            const radius = (count * 10) / zoom;
+            const gradient = ctx.createRadialGradient(
+              normalizedX,
+              normalizedY,
+              0,
+              normalizedX,
+              normalizedY,
+              radius
+            );
+            gradient.addColorStop(0, "rgba(255, 0, 0, 0.8)");
+            gradient.addColorStop(1, "rgba(255, 0, 0, 0)");
 
-        if (index === 0) {
-          ctx.moveTo(normalizedX, normalizedY);
-        } else {
-          ctx.lineTo(normalizedX, normalizedY);
+            ctx.beginPath();
+            ctx.arc(normalizedX, normalizedY, radius, 0, 2 * Math.PI);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+          });
         }
       });
-      ctx.stroke();
 
       ctx.restore();
     }
-  }, [tailmapData, zoom]);
+  }, [heatmapData, zoom]);
 
   const handleMouseMove = (e) => {
     if (isDragging) {
@@ -149,7 +180,7 @@ function TailmapReport() {
 
   return (
     <div>
-      <h1>Tailmap Report</h1>
+      <h1>Heatmap Report</h1>
       <div style={{ marginBottom: "20px", width: "300px" }}>
         <label>Select a Floor Map:</label>
         <ReactSelect
@@ -167,21 +198,22 @@ function TailmapReport() {
       </div>
       {selectedFloormap && (
         <div style={{ marginBottom: "20px", width: "300px" }}>
-          <label>Select an Asset:</label>
+          <label>Select Assets:</label>
           <ReactSelect
             options={assetOptions}
-            value={selectedAsset}
-            onChange={setSelectedAsset}
-            placeholder="Select an Asset..."
+            isMulti
+            value={selectedAssets}
+            onChange={setSelectedAssets}
+            placeholder="Select Assets..."
             styles={{
               container: (base) => ({ ...base, width: "100%" }),
             }}
           />
         </div>
       )}
-      <button onClick={handleTailMapGeneration}>Generate Tailmap Report</button>
+      <button onClick={handleHeatMapGeneration}>Generate Heatmap Report</button>
 
-      {tailmapData && (
+      {isHeatmapVisible && heatmapData && (
         <div
           className="floormap-detail"
           onMouseMove={handleMouseMove}
@@ -244,4 +276,4 @@ function TailmapReport() {
   );
 }
 
-export default TailmapReport;
+export default HeatmapReport;

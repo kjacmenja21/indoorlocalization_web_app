@@ -12,7 +12,6 @@ import AssetDetailPage from "./pages/AssetDetailPage.jsx";
 import FloormapDetail from "./pages/FloormapDetail.jsx";
 import ZoneEditing from "./pages/zone-editing/ZoneEditingPage.jsx";
 import HeatMapPage from "./pages/report-pages/HeatMapPage.jsx";
-import TailMapPage from "./pages/report-pages/TailMapPage.jsx";
 import TableReportPage from "./pages/report-pages/TableReportPage.jsx";
 
 function App() {
@@ -22,15 +21,39 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<PrivateRoute element={DashboardPage} />} />
-          <Route path="/floormap/:floormapId" element={<PrivateRoute element={FloormapDetail} />} />
+          <Route
+            path="/dashboard"
+            element={<PrivateRoute element={DashboardPage} />}
+          />
+          <Route
+            path="/floormap/:floormapId"
+            element={<PrivateRoute element={FloormapDetail} />}
+          />
           <Route path="/asset" element={<PrivateRoute element={AssetPage} />} />
-          <Route path="/assets/:id" element={<PrivateRoute element={AssetDetailPage} />} />
-          <Route path="/report" element={<PrivateRoute element={ReportPage} />} />
-          <Route path="/zone-editing/:floormapId" element={<PrivateRoute element={ZoneEditing} />} />
-          <Route path="/report/heatmap" element={<PrivateRoute element={HeatMapPage} />} />
-          <Route path="/report/tailmap" element={<PrivateRoute element={TailMapPage} />} />
-          <Route path="/report/table-report" element={<PrivateRoute element={TableReportPage} />} />
+          <Route
+            path="/assets/:id"
+            element={<PrivateRoute element={AssetDetailPage} />}
+          />
+          <Route
+            path="/report"
+            element={<PrivateRoute element={ReportPage} />}
+          />
+          <Route
+            path="/zone-editing/:floormapId"
+            element={<PrivateRoute element={ZoneEditing} />}
+          />
+          <Route
+            path="/report/heatmap"
+            element={<PrivateRoute element={HeatMapPage} />}
+          />
+          {/* <Route
+            path="/report/tailmap"
+            element={<PrivateRoute element={TailMapPage} />}
+          /> */}
+          <Route
+            path="/report/table-report"
+            element={<PrivateRoute element={TableReportPage} />}
+          />
         </Routes>
       </Layout>
     </div>

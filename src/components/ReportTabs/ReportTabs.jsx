@@ -1,6 +1,7 @@
 import React from "react";
 import "./_reportTabs.scss";
 import TailmapReport from "../TailmapReport/TailmapReport";
+import HeatmapReport from "../HeatmapReport/HeatmapReport";
 
 const Tabs = () => {
   return (
@@ -55,6 +56,7 @@ const Tabs = () => {
       <div className="tabs__content">
         <section className="tabs__content-section">
           <h2 className="tabs__content-section-header">HeatMap Report</h2>
+          <HeatmapReport />
         </section>
         <section className="tabs__content-section">
           <h2 className="tabs__content-section-header">TailMap Report</h2>
