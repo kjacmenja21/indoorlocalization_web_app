@@ -1,5 +1,6 @@
 import React from "react";
 import "./_reportTabs.scss";
+import TailmapReport from "../TailmapReport/TailmapReport";
 
 const Tabs = () => {
   return (
@@ -57,6 +58,7 @@ const Tabs = () => {
         </section>
         <section className="tabs__content-section">
           <h2 className="tabs__content-section-header">TailMap Report</h2>
+          <TailmapReport />
         </section>
         <section className="tabs__content-section">
           <h2 className="tabs__content-section-header">Table Report</h2>
