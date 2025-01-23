@@ -8,6 +8,8 @@ class ImageConverterService {
                 return "data:image/png;base64," + imageBase64;
             case "jpg":
                 return "data:image/jpeg;base64," + imageBase64;
+            case "jpeg":
+                return "data:image/jpeg;base64," + imageBase64;
             case "svg":
                 return "data:image/svg+xml;base64," + imageBase64;
             default:
