@@ -35,6 +35,14 @@ function HomePage() {
     navigate(`/floormap/${floormapId}`);
   };
 
+    const handleAddFloormap = async (floormapData, imageFile) => {
+    try {
+      const newFloormap = await FloorMapService.addFloorMap(floormapData, imageFile);
+      setFloormaps([...floormaps, newFloormap]);
+    } catch (error) {
+      console.error("Error adding floor map:", error.message);
+    }}
+
   return (
     <div className="home-page">
       {!isAuthenticated ? (
@@ -43,7 +51,7 @@ function HomePage() {
         <div>
           <h2>Floor Maps</h2>
           <Modal buttonText="Add New Floor Map" title="Add New Floor Map">
-            <AddFloormapForm />
+            <AddFloormapForm onAddFloorMap={handleAddFloormap}/>
           </Modal>
 
           <div className="floormap-grid">
