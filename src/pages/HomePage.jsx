@@ -5,6 +5,7 @@ import { AuthService } from "../services/auth/authService";
 import { FloorMapService } from "../services/floormapService.js";
 import AddFloormapForm from "../components/AddFloormapForm/AddFloormapForm.jsx";
 import Modal from "../components/Modal/Modal.jsx";
+import imageConverterService from "../services/imageConverterService.js";
 
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,7 +55,7 @@ function HomePage() {
                   onClick={() => handleFloormapClick(floormap.id)}
                 >
                   <img
-                    src={floormap.image}
+                    src={imageConverterService.getFloorMapImageSource(floormap)}
                     alt={floormap.name}
                     className="floormap-image"
                   />
