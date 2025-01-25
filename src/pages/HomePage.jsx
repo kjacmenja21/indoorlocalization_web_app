@@ -6,6 +6,7 @@ import { FloorMapService } from "../services/floormapService.js";
 import AddFloormapForm from "../components/AddFloormapForm/AddFloormapForm.jsx";
 import Modal from "../components/Modal/Modal.jsx";
 import imageConverterService from "../services/imageConverterService.js";
+import {cacheService} from "../services/cacheService.js";
 
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -19,7 +20,10 @@ function HomePage() {
       // Fetch floor maps if authenticated
       const fetchFloormaps = async () => {
         try {
-          const data = await FloorMapService.getAllFloorMaps();
+          const data = await cacheService.fetchAndCache(
+              "floormaps",
+              FloorMapService.getAllFloorMaps
+          );
           setFloormaps(data);
         } catch (error) {
           console.error("Error fetching floor maps:", error.message);

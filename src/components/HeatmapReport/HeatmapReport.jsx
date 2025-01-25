@@ -3,6 +3,7 @@ import ReactSelect from "react-select";
 import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import "./_heatmapReport.scss";
+import {cacheService} from "../../services/cacheService.js";
 
 function HeatmapReport() {
   const [floormaps, setFloormaps] = useState([]);
@@ -23,12 +24,17 @@ function HeatmapReport() {
   useEffect(() => {
     const fetchFloormaps = async () => {
       try {
-        const data = await FloorMapService.getAllFloorMaps();
+        // Use the cache service for fetching floormaps
+        const data = await cacheService.fetchAndCache(
+            "floormaps",
+            FloorMapService.getAllFloorMaps
+        );
         setFloormaps(data);
       } catch (error) {
         console.error("Error fetching floor maps:", error.message);
       }
     };
+
     fetchFloormaps();
   }, []);
 
