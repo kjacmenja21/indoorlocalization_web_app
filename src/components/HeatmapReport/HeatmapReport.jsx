@@ -24,7 +24,6 @@ function HeatmapReport() {
   useEffect(() => {
     const fetchFloormaps = async () => {
       try {
-        // Use the cache service for fetching floormaps
         const data = await cacheService.fetchAndCache(
             "floormaps",
             FloorMapService.getAllFloorMaps

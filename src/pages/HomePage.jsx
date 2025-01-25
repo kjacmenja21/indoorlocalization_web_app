@@ -18,12 +18,15 @@ function HomePage() {
     if (AuthService.isAuthenticated()) {
       setIsAuthenticated(true);
       // Fetch floor maps if authenticated
+      console.log("Autenticiran sam")
       const fetchFloormaps = async () => {
         try {
+          console.log("Pokusavam dohvatiti floor mape")
           const data = await cacheService.fetchAndCache(
               "floormaps",
               FloorMapService.getAllFloorMaps
           );
+          console.log("Dohvatio sam floor mape: ", data)
           setFloormaps(data);
         } catch (error) {
           console.error("Error fetching floor maps:", error.message);
