@@ -3,6 +3,7 @@ import ReactSelect from "react-select";
 import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import "./_tailmapReport.scss";
+import {cacheService} from "../../services/cacheService.js";
 
 function TailmapReport() {
   const [floormaps, setFloormaps] = useState([]);
@@ -22,12 +23,16 @@ function TailmapReport() {
   useEffect(() => {
     const fetchFloormaps = async () => {
       try {
-        const data = await FloorMapService.getAllFloorMaps();
+        const data = await cacheService.fetchAndCache(
+            "floormaps",
+            FloorMapService.getAllFloorMaps
+        );
         setFloormaps(data);
       } catch (error) {
         console.error("Error fetching floor maps:", error.message);
       }
     };
+
     fetchFloormaps();
   }, []);
 

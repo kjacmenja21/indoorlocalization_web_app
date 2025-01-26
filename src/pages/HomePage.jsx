@@ -5,6 +5,8 @@ import { AuthService } from "../services/auth/authService";
 import { FloorMapService } from "../services/floormapService.js";
 import AddFloormapForm from "../components/AddFloormapForm/AddFloormapForm.jsx";
 import Modal from "../components/Modal/Modal.jsx";
+import imageConverterService from "../services/imageConverterService.js";
+import {cacheService} from "../services/cacheService.js";
 
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,9 +18,15 @@ function HomePage() {
     if (AuthService.isAuthenticated()) {
       setIsAuthenticated(true);
       // Fetch floor maps if authenticated
+      console.log("Autenticiran sam")
       const fetchFloormaps = async () => {
         try {
-          const data = await FloorMapService.getAllFloorMaps();
+          console.log("Pokusavam dohvatiti floor mape")
+          const data = await cacheService.fetchAndCache(
+              "floormaps",
+              FloorMapService.getAllFloorMaps
+          );
+          console.log("Dohvatio sam floor mape: ", data)
           setFloormaps(data);
         } catch (error) {
           console.error("Error fetching floor maps:", error.message);
@@ -34,6 +42,14 @@ function HomePage() {
     navigate(`/floormap/${floormapId}`);
   };
 
+    const handleAddFloormap = async (floormapData, imageFile) => {
+    try {
+      const newFloormap = await FloorMapService.addFloorMap(floormapData, imageFile);
+      setFloormaps([...floormaps, newFloormap]);
+    } catch (error) {
+      console.error("Error adding floor map:", error.message);
+    }}
+
   return (
     <div className="home-page">
       {!isAuthenticated ? (
@@ -42,7 +58,7 @@ function HomePage() {
         <div>
           <h2>Floor Maps</h2>
           <Modal buttonText="Add New Floor Map" title="Add New Floor Map">
-            <AddFloormapForm />
+            <AddFloormapForm onAddFloorMap={handleAddFloormap}/>
           </Modal>
 
           <div className="floormap-grid">
@@ -54,7 +70,7 @@ function HomePage() {
                   onClick={() => handleFloormapClick(floormap.id)}
                 >
                   <img
-                    src={floormap.image}
+                    src={imageConverterService.getFloorMapImageSource(floormap)}
                     alt={floormap.name}
                     className="floormap-image"
                   />

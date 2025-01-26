@@ -77,7 +77,31 @@ function ZoneEditing() {
         console.log("Scaled zones:", scaledZones);
     }, [floormapScale, backendZones]);
 
-    const convertZonesForDisplay = (zones, scale) => {
+    const convertZonesForDisplay = (zones, scale = 1) => {
+        //Check if the zone is an object or an array
+        if(!Array.isArray(zones) && typeof zones === 'object'){
+            console.log("convert: ", zones)
+            const zone = zones.zone;
+            const minX = Math.min(...zone.points.map((p) => p.x));
+            const minY = Math.min(...zone.points.map((p) => p.y));
+            const maxX = Math.max(...zone.points.map((p) => p.x));
+            const maxY = Math.max(...zone.points.map((p) => p.y));
+
+            // Calculate the dimensions
+            const width = maxX - minX;
+            const height = maxY - minY;
+
+            // Return the zones in the drawing format, scaled for display
+            return {
+                id: zone.id,
+                name: zone.name,
+                color: `#${zone.color.toString(16).padStart(6, '0')}`, // Convert color to hex
+                x: minX * scale,
+                y: minY * scale,
+                width: width * scale,
+                height: height * scale,
+            };
+        }
         return zones.map((zone) => {
             // Extract the bounding box from the points
             const minX = Math.min(...zone.points.map((p) => p.x));
@@ -187,6 +211,7 @@ function ZoneEditing() {
 
             if (savedZone) {
                 // If the zone is successfully saved, update the local state
+                const savedZoneData = convertZonesForDisplay(savedZone, floormapScale);
                 const updatedZones = [...scaledZones, savedZoneData];
                 setScaledZones(updatedZones);
                 setNewZone(null);
@@ -233,7 +258,7 @@ function ZoneEditing() {
 
 
     const convertZoneData = (zoneData, floorMapId, scale) => {
-        const { name, color, x, y, width, height } = zoneData;
+        const { id, name, color, x, y, width, height } = zoneData;
 
         // Scale back to real-world dimensions
         const realX = x / scale;
@@ -254,12 +279,13 @@ function ZoneEditing() {
             floorMapId,
             color: parseInt(color.replace('#', ''), 16), // Convert hex color to integer
             points,
+            id,
         };
     };
 
 
     const convertBackendZoneData = (backendZoneData) => {
-        const { name, color, points } = backendZoneData;
+        const { id, name, color, points } = backendZoneData;
 
         // Extract the points from the backend data
         const [topLeft, topRight, bottomLeft] = points;
@@ -270,6 +296,7 @@ function ZoneEditing() {
 
         // Return the zone data in the format you can use for drawing
         return {
+            id,
             name,
             color: `#${color.toString(16).padStart(6, '0')}`, // Convert color back to hex
             x: topLeft.x,
@@ -284,7 +311,6 @@ function ZoneEditing() {
 
         // Convert scaled zone to real-world format
         const updatedRealWorldZone = convertZoneToRealWorld(updatedScaledZone);
-
         // Update real-world zones
         const updatedRealWorldZones = [...realWorldZones];
         updatedRealWorldZones[index] = updatedRealWorldZone;
@@ -329,51 +355,46 @@ function ZoneEditing() {
             }
         }
 
-        // Prepare zones for backend
-        const updatedRealWorldZones = Array.from(updatedZoneIndices).map(
-            (index) => realWorldZones[index]
-        );
-        const zonesToSave = updatedRealWorldZones.map((zone) =>
+
+        const zonesToSave = updatedZonesArray.map((zone) =>
             convertZoneData(zone, floormapId, 1) // Scale is 1 as zones are in real-world dimensions
         );
 
         console.log("Saving updated zones to backend:", zonesToSave);
-        /* TODO: When the backend is ready, activate this code block
+
         try {
-            // Simulate a backend API call to update zones
-            const updatedZones = await ZoneService.updateZones(zonesToSave);
-
-            if (updatedZones) {
-                // If successful, update the state
-                const updatedScaledZones = updatedZones.map((zone) =>
-                    convertZoneData(zone, floormapId, 1 / floormapScale) // Scale zones back for display
-                );
-
-                setScaledZones((prevZones) => {
-                    const newZones = [...prevZones];
-                    updatedZoneIndices.forEach((index, i) => {
-                        newZones[index] = updatedScaledZones[i];
-                    });
-                    return newZones;
-                });
-
-                setRealWorldZones((prevZones) => {
-                    const newZones = [...prevZones];
-                    updatedZoneIndices.forEach((index, i) => {
-                        newZones[index] = updatedZones[i];
-                    });
-                    return newZones;
-                });
-
-                setUpdatedZoneIndices(new Set());
-                console.log("Zones successfully updated and saved:", updatedZones);
-            } else {
-                alert("Failed to update zones. Please try again.");
+            for(const zone of zonesToSave){
+                console.log(zone)
+                const savedZone = await ZoneService.updateZone(zone);
+                console.log("Saved zone:", savedZone);
             }
+
+            const updatedScaledZones = zonesToSave.map((zone) =>
+                convertZonesForDisplay(zone, floormapId, 1 / floormapScale) // Scale zones back for display
+            );
+
+            setScaledZones((prevZones) => {
+                const newZones = [...prevZones];
+                updatedZoneIndices.forEach((index, i) => {
+                    newZones[index] = updatedScaledZones[i];
+                });
+                return newZones;
+            });
+            // NE znam za kaj se ovo koristi, chat je bio retard... Msm da mogu removat, al se bojim haha
+            setRealWorldZones((prevZones) => {
+                const newZones = [...prevZones];
+                updatedZoneIndices.forEach((index, i) => {
+                    newZones[index] = zonesToSave[i];
+                });
+                return newZones;
+            });
+
+            setUpdatedZoneIndices(new Set());
+
         } catch (error) {
             console.error("Error updating zones:", error);
             alert("An error occurred while updating the zones. Please try again later.");
-        }*/
+        }
         setUpdatedZoneIndices(new Set());
 
     };

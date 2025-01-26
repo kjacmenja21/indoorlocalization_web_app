@@ -25,7 +25,8 @@ function AddFloorMapForm({ onAddFloorMap, closeModal }) {
         alert("Please upload an image.");
         return;
       }
-      onAddFloorMap({ ...floorMapData, image: imageFile });
+      console.log("floorMapData: ", floorMapData, "imageFile: ", imageFile);
+      onAddFloorMap( floorMapData, imageFile );
       closeModal();
       setFloorMapData({
         name: "",

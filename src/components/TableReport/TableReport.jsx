@@ -4,6 +4,7 @@ import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import { ZoneService } from "../../services/zoneService.js";
 import "./_tableReport.scss";
+import {cacheService} from "../../services/cacheService.js";
 
 function TableReport() {
   const [floormaps, setFloormaps] = useState([]);
@@ -16,12 +17,16 @@ function TableReport() {
   useEffect(() => {
     const fetchFloormaps = async () => {
       try {
-        const data = await FloorMapService.getAllFloorMaps();
+        const data = await cacheService.fetchAndCache(
+            "floormaps",
+            FloorMapService.getAllFloorMaps
+        );
         setFloormaps(data);
       } catch (error) {
         console.error("Error fetching floor maps:", error.message);
       }
     };
+
     fetchFloormaps();
   }, []);
 

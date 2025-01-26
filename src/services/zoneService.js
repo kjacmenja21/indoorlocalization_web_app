@@ -12,6 +12,16 @@ export const ZoneService = {
         }
     },
 
+    updateZone: async (zone) => {
+        try {
+            const response = await axiosInstance.put(API_PATHS.ZONES, zone);
+            return response.data;
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || error.message || "Failed to update zone";
+            console.error(`Error updating zone: ${errorMessage}`);
+        }
+    },
+
     getZones: async (floormapId) => {
         try {
             const response = await axiosInstance.get(`${API_PATHS.ZONES}?floorMapId=${floormapId}`);
