@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Login from "../components/Login/Login";
-import { AuthService } from "../services/auth/authService";
-import { FloorMapService } from "../services/floormapService.js";
-import AddFloormapForm from "../components/AddFloormapForm/AddFloormapForm.jsx";
-import Modal from "../components/Modal/Modal.jsx";
-import imageConverterService from "../services/imageConverterService.js";
-import {cacheService} from "../services/cacheService.js";
+import Login from "../../components/Login/Login";
+import { AuthService } from "../../services/auth/authService";
+import { FloorMapService } from "../../services/floormapService.js";
+import AddFloormapForm from "../../components/AddFloormapForm/AddFloormapForm.jsx";
+import Modal from "../../components/Modal/Modal.jsx";
+import imageConverterService from "../../services/imageConverterService.js";
+import { cacheService } from "../../services/cacheService.js";
+import "./_homePage.scss";
 
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,15 +19,15 @@ function HomePage() {
     if (AuthService.isAuthenticated()) {
       setIsAuthenticated(true);
       // Fetch floor maps if authenticated
-      console.log("Autenticiran sam")
+      console.log("Autenticiran sam");
       const fetchFloormaps = async () => {
         try {
-          console.log("Pokusavam dohvatiti floor mape")
+          console.log("Pokusavam dohvatiti floor mape");
           const data = await cacheService.fetchAndCache(
-              "floormaps",
-              FloorMapService.getAllFloorMaps
+            "floormaps",
+            FloorMapService.getAllFloorMaps
           );
-          console.log("Dohvatio sam floor mape: ", data)
+          console.log("Dohvatio sam floor mape: ", data);
           setFloormaps(data);
         } catch (error) {
           console.error("Error fetching floor maps:", error.message);
@@ -42,13 +43,17 @@ function HomePage() {
     navigate(`/floormap/${floormapId}`);
   };
 
-    const handleAddFloormap = async (floormapData, imageFile) => {
+  const handleAddFloormap = async (floormapData, imageFile) => {
     try {
-      const newFloormap = await FloorMapService.addFloorMap(floormapData, imageFile);
+      const newFloormap = await FloorMapService.addFloorMap(
+        floormapData,
+        imageFile
+      );
       setFloormaps([...floormaps, newFloormap]);
     } catch (error) {
       console.error("Error adding floor map:", error.message);
-    }}
+    }
+  };
 
   return (
     <div className="home-page">
@@ -58,7 +63,7 @@ function HomePage() {
         <div>
           <h2>Floor Maps</h2>
           <Modal buttonText="Add New Floor Map" title="Add New Floor Map">
-            <AddFloormapForm onAddFloorMap={handleAddFloormap}/>
+            <AddFloormapForm onAddFloorMap={handleAddFloormap} />
           </Modal>
 
           <div className="floormap-grid">

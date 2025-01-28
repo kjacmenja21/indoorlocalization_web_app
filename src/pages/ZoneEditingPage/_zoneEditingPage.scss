@@ -1,8 +1,12 @@
+@use "../../styles/variables";
+
 .zone-editing {
   display: flex;
   margin-left: 65px; // Offset for the menu
   padding: 1rem;
-  height: calc(100vh - 2rem); // Ensure the container respects the viewport height
+  height: calc(
+    100vh - 2rem
+  ); // Ensure the container respects the viewport height
 
   &__content {
     flex-grow: 1;
