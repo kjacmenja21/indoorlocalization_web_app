@@ -4,7 +4,7 @@ import { Stage, Layer, Rect } from "react-konva";
 import { FloorMapService } from "../../services/floormapService.js";
 import "../_pages.scss";
 import ZoneStage from "../../components/ZoneStage/ZoneStage.jsx";
-import ZoneMenu from "./ZoneMenu.jsx";
+import ZoneMenu from "../../components/ZoneMenu/ZoneMenu.jsx";
 import { ZoneService } from "../../services/zoneService.js";
 
 function ZoneEditing() {
