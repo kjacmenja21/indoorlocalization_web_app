@@ -9,10 +9,6 @@ function ReportPage() {
         <h1>Reports</h1>
       </div>
       <ReportTabs></ReportTabs>
-
-      <Link to="/report/table-report">
-        <button>Go to Table Report</button>
-      </Link>
     </>
   );
 }

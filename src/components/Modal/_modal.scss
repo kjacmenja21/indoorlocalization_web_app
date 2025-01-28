@@ -1,4 +1,5 @@
-@import "../../styles/_variables.scss";
+@use "../../styles/variables" as *;
+@use "sass:color";
 
 // -------------- BUTTON
 
@@ -16,7 +17,7 @@
   border: none;
 
   &:hover {
-    background-color: lighten(#16a34a, 2%);
+    background-color: color.adjust(#16a34a, $lightness: 2%);
   }
 }
 
