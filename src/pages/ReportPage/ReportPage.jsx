@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import ReportTabs from "../components/ReportTabs/ReportTabs";
+import ReportTabs from "../../components/ReportTabs/ReportTabs";
+import "./_reportPage.scss";
 
 function ReportPage() {
   return (

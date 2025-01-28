@@ -1,3 +1,5 @@
+@use "../../styles/variables";
+
 .floormap-detail {
   .floormap-container {
     position: relative;
@@ -9,8 +11,8 @@
   .asset {
     transition: transform 0.1s linear;
 
-
-    &.circle { // Apply circle styles directly to the asset
+    &.circle {
+      // Apply circle styles directly to the asset
       width: 10px;
       height: 10px;
       background-color: red;
@@ -30,7 +32,6 @@
       pointer-events: none;
     }
   }
-
 
   .dialog {
     position: absolute;

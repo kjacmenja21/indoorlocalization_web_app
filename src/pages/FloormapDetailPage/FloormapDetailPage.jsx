@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FloorMapService } from "../services/floormapService.js";
-import AssetSimulationService from "../services/assetSimulationService.js";
-import FloormapDisplay from "../components/FloormapDisplay/FloormapDisplay.jsx";
-import AssetSelector from "../components/AssetSelector/AssetSelector.jsx";
+import { FloorMapService } from "../../services/floormapService.js";
+import AssetSimulationService from "../../services/assetSimulationService.js";
+import FloormapDisplay from "../../components/FloormapDisplay/FloormapDisplay.jsx";
+import AssetSelector from "../../components/AssetSelector/AssetSelector.jsx";
+import "./_floormapDetailPage.scss";
 
 function FloormapDetail() {
   const { floormapId } = useParams();
