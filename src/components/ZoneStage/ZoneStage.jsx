@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ZoneEditor from "../../pages/zone-editing/ZoneEditor.jsx";
+import ZoneEditor from "../ZoneEditor/ZoneEditor.jsx";
 import { Layer, Stage } from "react-konva";
 
 const ZoneStage = ({

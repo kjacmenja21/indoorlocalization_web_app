@@ -10,7 +10,7 @@ import Login from "./components/Login/Login.jsx";
 import PrivateRoute from "./core/guard/privateRoute.jsx";
 import AssetDetailPage from "./pages/AssetDetailPage.jsx";
 import FloormapDetail from "./pages/FloormapDetail.jsx";
-import ZoneEditing from "./pages/zone-editing/ZoneEditingPage.jsx";
+import ZoneEditing from "./pages/ZoneEditingPage.jsx";
 
 function App() {
   return (
