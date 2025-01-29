@@ -15,19 +15,14 @@ function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is authenticated
     if (AuthService.isAuthenticated()) {
       setIsAuthenticated(true);
-      // Fetch floor maps if authenticated
-      console.log("Autenticiran sam");
       const fetchFloormaps = async () => {
         try {
-          console.log("Pokusavam dohvatiti floor mape");
           const data = await cacheService.fetchAndCache(
             "floormaps",
             FloorMapService.getAllFloorMaps
           );
-          console.log("Dohvatio sam floor mape: ", data);
           setFloormaps(data);
         } catch (error) {
           console.error("Error fetching floor maps:", error.message);
@@ -60,28 +55,29 @@ function HomePage() {
       {!isAuthenticated ? (
         <Login />
       ) : (
-        <div>
-          <h2>Floor Maps</h2>
-          <Modal buttonText="Add New Floor Map" title="Add New Floor Map">
-            <AddFloormapForm onAddFloorMap={handleAddFloormap} />
-          </Modal>
-
-          <div className="floormap-grid">
+        <div className="home-page__content">
+          <div className="home-page__header">
+            <h2 className="home-page__title">Floor Maps</h2>
+            <Modal buttonText="Add New Floor Map" title="Add New Floor Map">
+              <AddFloormapForm onAddFloorMap={handleAddFloormap} />
+            </Modal>
+          </div>
+          <div className="home-page__floormap-grid">
             {floormaps.length > 0 ? (
               floormaps.map((floormap) => (
                 <div
                   key={floormap.id}
-                  className="floormap-item"
+                  className="home-page__floormap-item"
                   onClick={() => handleFloormapClick(floormap.id)}
                 >
                   <img
                     src={imageConverterService.getFloorMapImageSource(floormap)}
                     alt={floormap.name}
-                    className="floormap-image"
+                    className="home-page__floormap-image"
                   />
-                  <p>{floormap.name}</p>
+                  <p className="home-page__floormap-name">{floormap.name}</p>
                   <button
-                    className="btn"
+                    className="home-page__floormap-button btn"
                     onClick={() => handleFloormapClick(floormap.id)}
                   >
                     View Details
@@ -89,7 +85,9 @@ function HomePage() {
                 </div>
               ))
             ) : (
-              <p>No floor maps available.</p>
+              <p className="home-page__no-floormaps">
+                No floor maps available.
+              </p>
             )}
           </div>
         </div>
