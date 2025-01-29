@@ -12,6 +12,7 @@ import "./_homePage.scss";
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [floormaps, setFloormaps] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,6 +51,14 @@ function HomePage() {
     }
   };
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredFloormaps = floormaps.filter((floormap) =>
+    floormap.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="home-page">
       {!isAuthenticated ? (
@@ -62,9 +71,18 @@ function HomePage() {
               <AddFloormapForm onAddFloorMap={handleAddFloormap} />
             </Modal>
           </div>
+          <div className="home-page__search">
+            <input
+              type="text"
+              placeholder="Search Floor Maps..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="home-page__search-input"
+            />
+          </div>
           <div className="home-page__floormap-grid">
-            {floormaps.length > 0 ? (
-              floormaps.map((floormap) => (
+            {filteredFloormaps.length > 0 ? (
+              filteredFloormaps.map((floormap) => (
                 <div
                   key={floormap.id}
                   className="home-page__floormap-item"
@@ -86,7 +104,9 @@ function HomePage() {
               ))
             ) : (
               <p className="home-page__no-floormaps">
-                No floor maps available.
+                {searchQuery
+                  ? "No floor maps found matching your search."
+                  : "No floor maps available."}
               </p>
             )}
           </div>
