@@ -11,6 +11,7 @@ function FloormapDetail() {
   const navigate = useNavigate();
   const [assets, setAssets] = useState([]);
   const [activeAsset, setActiveAssetState] = useState([]);
+  const [floormapName, setFloormapName] = useState("");
 
   const setActiveAsset = useCallback((asset) => {
     setActiveAssetState(asset);
@@ -22,6 +23,7 @@ function FloormapDetail() {
         navigate("/floormaps");
         return;
       }
+      setFloormapName(floormap.name);
       let assetSimulationService = new AssetSimulationService(
         floormapId,
         floormap.width,
@@ -37,17 +39,25 @@ function FloormapDetail() {
   };
 
   return (
-    <div>
-      <AssetSelector assets={assets} setActiveAsset={setActiveAsset} />
+    <div className="floormap-detail">
+      <div className="header-section">
+        <h1 className="title">Floormap: {floormapName}</h1>
+
+        {/* Flex container for dropdown and button */}
+        <div className="controls-container">
+          <AssetSelector assets={assets} setActiveAsset={setActiveAsset} />
+          <button onClick={handleEditZone} className="edit-button">
+            Edit Zones
+          </button>
+        </div>
+      </div>
+
       <FloormapDisplay
         floormapId={floormapId}
         assets={assets}
         activeAsset={activeAsset}
         setActiveAsset={setActiveAsset}
       />
-      <button onClick={handleEditZone} style={{ marginTop: "20px" }}>
-        Edit Zones
-      </button>
     </div>
   );
 }
