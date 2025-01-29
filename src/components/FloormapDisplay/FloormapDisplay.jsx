@@ -66,8 +66,6 @@ function FloormapDisplay({ floormapId, assets, activeAsset, setActiveAsset }) {
       onMouseLeave={() => setIsDragging(false)}
       style={{ userSelect: "none", overflow: "hidden" }}
     >
-      <h2>Floormap Detail for {floormapId}</h2>
-      {/* <AssetSelector assets={assets} setActiveAsset={setActiveAsset} /> */}
       <div
         className="floormap-container"
         style={{

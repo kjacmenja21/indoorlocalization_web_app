@@ -12,22 +12,18 @@ import "./_homePage.scss";
 function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [floormaps, setFloormaps] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is authenticated
     if (AuthService.isAuthenticated()) {
       setIsAuthenticated(true);
-      // Fetch floor maps if authenticated
-      console.log("Autenticiran sam");
       const fetchFloormaps = async () => {
         try {
-          console.log("Pokusavam dohvatiti floor mape");
           const data = await cacheService.fetchAndCache(
             "floormaps",
             FloorMapService.getAllFloorMaps
           );
-          console.log("Dohvatio sam floor mape: ", data);
           setFloormaps(data);
         } catch (error) {
           console.error("Error fetching floor maps:", error.message);
@@ -55,33 +51,51 @@ function HomePage() {
     }
   };
 
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredFloormaps = floormaps.filter((floormap) =>
+    floormap.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="home-page">
       {!isAuthenticated ? (
         <Login />
       ) : (
-        <div>
-          <h2>Floor Maps</h2>
-          <Modal buttonText="Add New Floor Map" title="Add New Floor Map">
-            <AddFloormapForm onAddFloorMap={handleAddFloormap} />
-          </Modal>
-
-          <div className="floormap-grid">
-            {floormaps.length > 0 ? (
-              floormaps.map((floormap) => (
+        <div className="home-page__content">
+          <div className="home-page__header">
+            <h2 className="home-page__title">Floor Maps</h2>
+            <Modal buttonText="Add New Floor Map" title="Add New Floor Map">
+              <AddFloormapForm onAddFloorMap={handleAddFloormap} />
+            </Modal>
+          </div>
+          <div className="home-page__search">
+            <input
+              type="text"
+              placeholder="Search Floor Maps..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="home-page__search-input"
+            />
+          </div>
+          <div className="home-page__floormap-grid">
+            {filteredFloormaps.length > 0 ? (
+              filteredFloormaps.map((floormap) => (
                 <div
                   key={floormap.id}
-                  className="floormap-item"
+                  className="home-page__floormap-item"
                   onClick={() => handleFloormapClick(floormap.id)}
                 >
                   <img
                     src={imageConverterService.getFloorMapImageSource(floormap)}
                     alt={floormap.name}
-                    className="floormap-image"
+                    className="home-page__floormap-image"
                   />
-                  <p>{floormap.name}</p>
+                  <p className="home-page__floormap-name">{floormap.name}</p>
                   <button
-                    className="btn"
+                    className="home-page__floormap-button btn"
                     onClick={() => handleFloormapClick(floormap.id)}
                   >
                     View Details
@@ -89,7 +103,11 @@ function HomePage() {
                 </div>
               ))
             ) : (
-              <p>No floor maps available.</p>
+              <p className="home-page__no-floormaps">
+                {searchQuery
+                  ? "No floor maps found matching your search."
+                  : "No floor maps available."}
+              </p>
             )}
           </div>
         </div>
