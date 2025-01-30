@@ -2,7 +2,7 @@
 @use "sass:color";
 
 .table-report {
-  padding: 2rem;
+  padding: 20px;
   font-family: "Arial", sans-serif;
 
   &__title {
@@ -10,6 +10,7 @@
     font-size: 2rem;
     margin-bottom: 2rem;
     font-weight: 600;
+    padding: 0 1rem;
   }
 
   &__controls {
@@ -17,11 +18,13 @@
     padding: 2rem;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    max-width: 600px;
+    width: 93%;
+    margin-bottom: 2rem;
   }
 
   &__form-group {
     margin-bottom: 1.5rem;
+
     &:last-child {
       margin-bottom: 0;
     }
@@ -29,60 +32,69 @@
 
   &__label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     color: #5b6162;
     font-size: 0.9rem;
     font-weight: 500;
   }
 
   &__select {
+    width: 100%;
+
     .react-select__control {
       border-radius: 4px;
-      border-color: #ced4da !important;
-      box-shadow: none !important;
+      border-color: #ced4da;
+      transition: border-color 0.2s;
+      width: 100%;
+
       &:hover {
-        border-color: #adb5bd !important;
+        border-color: #adb5bd;
       }
     }
+
     .react-select__menu {
       border-radius: 4px;
       margin-top: 4px;
+      width: 100%;
     }
   }
 
   &__generate-btn {
-    background: #5b6162;
+    background-color: #5b6162;
     color: white;
     border: none;
     padding: 12px 24px;
     border-radius: 4px;
-    width: 100%;
-    margin-top: 1.5rem;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    font-weight: 500;
+    width: 100%;
+    margin-top: 1rem;
+
     &:hover {
-      background: color.adjust(#5b6162, $lightness: -10%);
+      background-color: color.adjust(#5b6162, $lightness: -10%);
+      transform: translateY(-1px);
     }
   }
 
   &__container {
-    margin-top: 2rem;
-    background: white;
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 2rem auto;
+    max-width: calc(800px + 2rem);
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 5rem;
+    padding: 0 1rem;
   }
 
   &__subtitle {
     color: #5b6162;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 500;
     margin: 0;
   }
 
@@ -90,10 +102,13 @@
     background: #5b6162;
     color: white;
     border: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
     &:hover {
       background: color.adjust(#5b6162, $lightness: -10%);
     }
@@ -129,24 +144,29 @@
   &__column {
     &--asset {
       flex: 2;
+      padding: 0 1rem;
     }
     &--zone {
       flex: 2;
+      padding: 0 1rem;
     }
     &--time {
       flex: 1;
       text-align: right;
+      padding: 0 1rem;
     }
 
     @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+      padding: 0.5rem 0;
+
       &::before {
         content: attr(data-label);
-        flex: 1;
         font-weight: 600;
         color: #5b6162;
+        margin-bottom: 0.5rem;
       }
-      text-align: right;
-      padding: 0.5rem 0;
     }
   }
 
@@ -159,4 +179,12 @@
       padding: 1rem;
     }
   }
+}
+
+.react-select__indicator-separator {
+  background-color: #ced4da !important;
+}
+
+.react-select__dropdown-indicator {
+  color: #5b6162 !important;
 }

@@ -118,30 +118,30 @@ function TableReport() {
 
   return (
     <div className="table-report">
+      <h1 className="table-report__title">Table Report</h1>
+
       {!isTableReportVisible && (
         <div className="table-report__controls">
-          <h1 className="table-report__title">Table Report</h1>
-
           <div className="table-report__form-group">
-            <label className="table-report__label">Floor Map</label>
+            <label className="table-report__label">Select a Floor Map:</label>
             <ReactSelect
               className="table-report__select"
               options={floormapOptions}
               onChange={handleFloormapSelect}
-              placeholder="Select floor map"
+              placeholder="Select a Floor Map"
             />
           </div>
 
           {selectedFloormap && (
             <div className="table-report__form-group">
-              <label className="table-report__label">Assets</label>
+              <label className="table-report__label">Select Assets:</label>
               <ReactSelect
                 className="table-report__select"
                 options={assetOptions}
                 isMulti
                 value={selectedAssets}
                 onChange={setSelectedAssets}
-                placeholder="Select assets"
+                placeholder="Select Assets..."
               />
             </div>
           )}
