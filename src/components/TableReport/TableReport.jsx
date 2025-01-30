@@ -4,7 +4,7 @@ import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import { ZoneService } from "../../services/zoneService.js";
 import "./_tableReport.scss";
-import {cacheService} from "../../services/cacheService.js";
+import { cacheService } from "../../services/cacheService.js";
 
 function TableReport() {
   const [floormaps, setFloormaps] = useState([]);
@@ -18,15 +18,14 @@ function TableReport() {
     const fetchFloormaps = async () => {
       try {
         const data = await cacheService.fetchAndCache(
-            "floormaps",
-            FloorMapService.getAllFloorMaps
+          "floormaps",
+          FloorMapService.getAllFloorMaps
         );
         setFloormaps(data);
       } catch (error) {
         console.error("Error fetching floor maps:", error.message);
       }
     };
-
     fetchFloormaps();
   }, []);
 
@@ -38,7 +37,6 @@ function TableReport() {
 
   useEffect(() => {
     if (!selectedFloormap) return;
-
     const fetchAssets = async () => {
       let allAssets = [];
       let page = 1;
@@ -51,24 +49,19 @@ function TableReport() {
             page,
             itemsPerPage
           );
-
-          if (response && response.page && response.page.length > 0) {
+          if (response?.page?.length > 0) {
             allAssets = [...allAssets, ...response.page];
             page++;
             hasMoreAssets = page <= response.total_pages;
-          } else {
-            hasMoreAssets = false;
-          }
+          } else hasMoreAssets = false;
         }
-        const filteredAssets = allAssets.filter(
-          (asset) => asset.floormap_id === selectedFloormap.id
+        setAssets(
+          allAssets.filter((asset) => asset.floormap_id === selectedFloormap.id)
         );
-        setAssets(filteredAssets);
       } catch (error) {
-        console.error("Error fetching all assets:", error.message);
+        console.error("Error fetching assets:", error.message);
       }
     };
-
     fetchAssets();
   }, [selectedFloormap]);
 
@@ -77,135 +70,123 @@ function TableReport() {
     label: asset.name,
   }));
 
-  function handleFloormapSelect(selectedOption) {
+  const handleFloormapSelect = (selectedOption) => {
     setSelectedFloormap(selectedOption.floormap);
     setSelectedAssets([]);
     setTableReportData(null);
     setIsTableReportVisible(false);
-  }
+  };
 
-  async function handleTableReportGeneration() {
-    const aggregatedData = [];
-
+  const handleTableReportGeneration = async () => {
     try {
       const zones = await ZoneService.getZones(selectedFloormap.id);
+      if (!zones) return;
 
-      if (!zones) {
-        console.error("Failed to fetch zones data");
-        return;
-      }
+      const reportData = (
+        await Promise.all(
+          selectedAssets.map(async (asset) => {
+            const history = await AssetService.getAssetZoneHistory(
+              asset.value,
+              "2025-01-14T09:00:00",
+              "2025-01-15T09:00:00"
+            );
 
-      const selectedAssetAggregations = await Promise.all(
-        selectedAssets.map(async (asset) => {
-          const data = await AssetService.getAssetZoneHistory(
-            asset.value,
-            "2025-01-14T09:00:00",
-            "2025-01-15T09:00:00"
-          );
+            return history.map(({ zoneId, enterDateTime, exitDateTime }) => {
+              const timeSpent =
+                (new Date(exitDateTime) - new Date(enterDateTime)) / 3.6e6;
+              const zone = zones.find((z) => z.id === zoneId) || {
+                name: "Unknown Zone",
+              };
+              return {
+                assetName: asset.label,
+                zoneName: zone.name,
+                timeSpent: timeSpent.toFixed(2),
+              };
+            });
+          })
+        )
+      ).flat();
 
-          const zoneTimeMap = data.reduce(
-            (acc, { zoneId, enterDateTime, exitDateTime }) => {
-              const enterTime = new Date(enterDateTime);
-              const exitTime = new Date(exitDateTime);
-
-              const timeSpent = (exitTime - enterTime) / (1000 * 60 * 60);
-
-              if (!acc[zoneId]) {
-                acc[zoneId] = {
-                  assetId: asset.value,
-                  assetName: asset.label,
-                  zoneId: zoneId,
-                  timeSpent: 0,
-                };
-              }
-
-              acc[zoneId].timeSpent += timeSpent;
-              return acc;
-            },
-            {}
-          );
-
-          const enrichedZones = Object.values(zoneTimeMap).map((zone) => {
-            const zoneDetails = zones.find((z) => z.id === zone.zoneId);
-            return {
-              ...zone,
-              zoneName: zoneDetails ? zoneDetails.name : "Unknown Zone",
-            };
-          });
-
-          return enrichedZones;
-        })
-      );
-
-      selectedAssetAggregations.forEach((assetZones) => {
-        aggregatedData.push(...assetZones);
-      });
-
-      setTableReportData(aggregatedData);
+      setTableReportData(reportData);
       setIsTableReportVisible(true);
     } catch (error) {
-      console.error("Error generating table report:", error.message);
+      console.error("Report generation failed:", error.message);
     }
-  }
+  };
+
+  const handleReload = () => window.location.reload();
 
   return (
-    <div>
-      <h1>Table Report</h1>
-      <div style={{ marginBottom: "20px", width: "300px" }}>
-        <label>Select a Floor Map:</label>
-        <ReactSelect
-          options={floormapOptions}
-          onChange={handleFloormapSelect}
-          placeholder="Select a Floor Map"
-          styles={{
-            container: (base) => ({
-              ...base,
-              marginBottom: "10px",
-              width: "100%",
-            }),
-          }}
-        />
-      </div>
-      {selectedFloormap && (
-        <div style={{ marginBottom: "20px", width: "300px" }}>
-          <label>Select Assets:</label>
-          <ReactSelect
-            options={assetOptions}
-            isMulti
-            value={selectedAssets}
-            onChange={setSelectedAssets}
-            placeholder="Select Assets..."
-            styles={{
-              container: (base) => ({ ...base, width: "100%" }),
-            }}
-          />
+    <div className="table-report">
+      {!isTableReportVisible && (
+        <div className="table-report__controls">
+          <h1 className="table-report__title">Table Report</h1>
+
+          <div className="table-report__form-group">
+            <label className="table-report__label">Floor Map</label>
+            <ReactSelect
+              className="table-report__select"
+              options={floormapOptions}
+              onChange={handleFloormapSelect}
+              placeholder="Select floor map"
+            />
+          </div>
+
+          {selectedFloormap && (
+            <div className="table-report__form-group">
+              <label className="table-report__label">Assets</label>
+              <ReactSelect
+                className="table-report__select"
+                options={assetOptions}
+                isMulti
+                value={selectedAssets}
+                onChange={setSelectedAssets}
+                placeholder="Select assets"
+              />
+            </div>
+          )}
+
+          <button
+            className="table-report__generate-btn"
+            onClick={handleTableReportGeneration}
+          >
+            Generate Report
+          </button>
         </div>
       )}
-      <button onClick={handleTableReportGeneration}>
-        Generate Table Report
-      </button>
 
-      {isTableReportVisible && tableReportData && (
-        <div className="table-report">
-          <h2>Table Report for {selectedFloormap.name}</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Asset Name</th>
-                <th>Zone Name</th>
-                <th>Time Spent (hours)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableReportData.map((row, index) => (
-                <tr key={index}>
-                  <td>{row.assetName}</td>
-                  <td>{row.zoneName}</td>
-                  <td>{row.timeSpent.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {isTableReportVisible && (
+        <div className="table-report__container">
+          <div className="table-report__header">
+            <h2 className="table-report__subtitle">
+              Report for {selectedFloormap?.name}
+            </h2>
+            <button className="table-report__reload-btn" onClick={handleReload}>
+              New Report
+            </button>
+          </div>
+
+          <ul className="table-report__list">
+            <li className="table-report__list-header">
+              <div className="table-report__column--asset">Asset</div>
+              <div className="table-report__column--zone">Zone</div>
+              <div className="table-report__column--time">Hours</div>
+            </li>
+
+            {tableReportData?.map((item, index) => (
+              <li key={index} className="table-report__list-row">
+                <div className="table-report__column--asset" data-label="Asset">
+                  {item.assetName}
+                </div>
+                <div className="table-report__column--zone" data-label="Zone">
+                  {item.zoneName}
+                </div>
+                <div className="table-report__column--time" data-label="Hours">
+                  {item.timeSpent}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
