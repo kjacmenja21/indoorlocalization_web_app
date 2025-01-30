@@ -5,12 +5,12 @@ import "./_reportPage.scss";
 
 function ReportPage() {
   return (
-    <>
-      <div>
-        <h1>Reports</h1>
+    <div className="report-page">
+      <div className="report-page__header">
+        <h1 className="report-page__title">Reports</h1>
       </div>
       <ReportTabs></ReportTabs>
-    </>
+    </div>
   );
 }
 
