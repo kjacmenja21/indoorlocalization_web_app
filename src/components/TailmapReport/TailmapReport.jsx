@@ -3,7 +3,7 @@ import ReactSelect from "react-select";
 import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import "./_tailmapReport.scss";
-import {cacheService} from "../../services/cacheService.js";
+import { cacheService } from "../../services/cacheService.js";
 
 function TailmapReport() {
   const [floormaps, setFloormaps] = useState([]);
@@ -11,6 +11,7 @@ function TailmapReport() {
   const [assets, setAssets] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [tailmapData, setTailmapData] = useState(null);
+  const [isTailmapVisible, setIsTailmapVisible] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -20,12 +21,19 @@ function TailmapReport() {
   const containerSize = { width: 800, height: 600 };
   const imageSize = { width: 1600, height: 1100 };
 
+  // Deklaracija floormapOptions prije korištenja u JSX-u
+  const floormapOptions = floormaps.map((floormap) => ({
+    value: floormap.id,
+    label: floormap.name,
+    floormap,
+  }));
+
   useEffect(() => {
     const fetchFloormaps = async () => {
       try {
         const data = await cacheService.fetchAndCache(
-            "floormaps",
-            FloorMapService.getAllFloorMaps
+          "floormaps",
+          FloorMapService.getAllFloorMaps
         );
         setFloormaps(data);
       } catch (error) {
@@ -35,12 +43,6 @@ function TailmapReport() {
 
     fetchFloormaps();
   }, []);
-
-  const floormapOptions = floormaps.map((floormap) => ({
-    value: floormap.id,
-    label: floormap.name,
-    floormap,
-  }));
 
   useEffect(() => {
     if (!selectedFloormap) return;
@@ -58,7 +60,7 @@ function TailmapReport() {
             itemsPerPage
           );
 
-          if (response && response.page && response.page.length > 0) {
+          if (response?.page?.length > 0) {
             allAssets = [...allAssets, ...response.page];
             page++;
             hasMoreAssets = page <= response.total_pages;
@@ -87,6 +89,7 @@ function TailmapReport() {
     setSelectedFloormap(selectedOption.floormap);
     setSelectedAsset(null);
     setTailmapData(null);
+    setIsTailmapVisible(false);
   }
 
   async function handleTailMapGeneration() {
@@ -99,6 +102,7 @@ function TailmapReport() {
         "2025-01-15T09:00:00"
       );
       setTailmapData(data);
+      setIsTailmapVisible(true);
     } catch (error) {
       console.error("Error fetching tailmap data:", error.message);
     }
@@ -152,96 +156,115 @@ function TailmapReport() {
     }
   };
 
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
-    <div>
-      <h1>Tailmap Report</h1>
-      <div style={{ marginBottom: "20px", width: "300px" }}>
-        <label>Select a Floor Map:</label>
-        <ReactSelect
-          options={floormapOptions}
-          onChange={handleFloormapSelect}
-          placeholder="Select a Floor Map"
-          styles={{
-            container: (base) => ({
-              ...base,
-              marginBottom: "10px",
-              width: "100%",
-            }),
-          }}
-        />
-      </div>
-      {selectedFloormap && (
-        <div style={{ marginBottom: "20px", width: "300px" }}>
-          <label>Select an Asset:</label>
-          <ReactSelect
-            options={assetOptions}
-            value={selectedAsset}
-            onChange={setSelectedAsset}
-            placeholder="Select an Asset..."
-            styles={{
-              container: (base) => ({ ...base, width: "100%" }),
-            }}
-          />
+    <div className="tailmap-report">
+      {!isTailmapVisible && (
+        <h1 className="tailmap-report__title">Tailmap Report</h1>
+      )}
+
+      {!isTailmapVisible && (
+        <div className="tailmap-report__controls">
+          <div className="tailmap-report__form-group">
+            <label className="tailmap-report__label">Select a Floor Map:</label>
+            <ReactSelect
+              className="tailmap-report__select"
+              options={floormapOptions}
+              onChange={handleFloormapSelect}
+              placeholder="Select a Floor Map"
+            />
+          </div>
+
+          {selectedFloormap && (
+            <div className="tailmap-report__form-group">
+              <label className="tailmap-report__label">Select Asset:</label>
+              <ReactSelect
+                className="tailmap-report__select"
+                options={assetOptions}
+                value={selectedAsset}
+                onChange={setSelectedAsset}
+                placeholder="Select Asset..."
+              />
+            </div>
+          )}
+
+          <button
+            className="tailmap-report__generate-btn"
+            onClick={handleTailMapGeneration}
+          >
+            Generate Tailmap Report
+          </button>
         </div>
       )}
-      <button onClick={handleTailMapGeneration}>Generate Tailmap Report</button>
 
-      {tailmapData && (
-        <div
-          className="floormap-detail"
-          onMouseMove={handleMouseMove}
-          onMouseUp={() => setIsDragging(false)}
-          onMouseLeave={() => setIsDragging(false)}
-          style={{ userSelect: "none", overflow: "hidden" }}
-        >
-          <h2>Floormap Detail for {selectedFloormap.id}</h2>
+      {isTailmapVisible && tailmapData && (
+        <div className="tailmap-report__tailmap-container">
+          <div className="tailmap-report__header">
+            <h2 className="tailmap-report__subtitle">
+              Floormap Detail for {selectedFloormap.id}
+            </h2>
+            <button
+              className="tailmap-report__reload-btn"
+              onClick={handleReload}
+            >
+              New Report
+            </button>
+          </div>
+
           <div
-            className="floormap-container"
-            style={{
-              width: `${containerSize.width}px`,
-              height: `${containerSize.height}px`,
-              overflow: "hidden",
-              position: "relative",
-              border: "1px solid #ccc",
-              cursor: isDragging ? "grabbing" : "grab",
-            }}
-            onMouseDown={(e) => {
-              setIsDragging(true);
-              setDragStart({
-                x: e.clientX - position.x,
-                y: e.clientY - position.y,
-              });
-            }}
+            className="tailmap-report__map-wrapper"
+            onMouseMove={handleMouseMove}
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
           >
-            <img
-              src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
-              alt="Floor Map"
-              draggable={false}
+            <div
+              className="tailmap-report__map-container"
               style={{
-                width: `${imageSize.width}px`,
-                height: `${imageSize.height}px`,
-                position: "absolute",
-                top: position.y,
-                left: position.x,
-                transform: `scale(${zoom})`,
-                transformOrigin: "top left",
+                width: `${containerSize.width}px`,
+                height: `${containerSize.height}px`,
+                cursor: isDragging ? "grabbing" : "grab",
               }}
-            />
-            <canvas
-              ref={canvasRef}
-              width={imageSize.width}
-              height={imageSize.height}
-              style={{
-                position: "absolute",
-                top: position.y,
-                left: position.x,
-                width: `${imageSize.width}px`,
-                height: `${imageSize.height}px`,
-                transform: `scale(${zoom})`,
-                transformOrigin: "top left",
-                pointerEvents: "none",
+              onMouseDown={(e) => {
+                setIsDragging(true);
+                setDragStart({
+                  x: e.clientX - position.x,
+                  y: e.clientY - position.y,
+                });
               }}
-            />
+            >
+              <img
+                src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
+                alt="Floor Map"
+                draggable={false}
+                style={{
+                  width: `${imageSize.width}px`,
+                  height: `${imageSize.height}px`,
+                  position: "absolute",
+                  top: position.y,
+                  left: position.x,
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "top left",
+                }}
+              />
+              <canvas
+                ref={canvasRef}
+                width={imageSize.width}
+                height={imageSize.height}
+                style={{
+                  position: "absolute",
+                  top: position.y,
+                  left: position.x,
+                  width: `${imageSize.width}px`,
+                  height: `${imageSize.height}px`,
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "top left",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
