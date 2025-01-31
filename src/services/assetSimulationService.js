@@ -1,3 +1,6 @@
+
+import { mqttService } from "./mqttService";
+
 class AssetSimulationService {
     constructor(floormapId, floormapWidth, floormapHeight, movementSpeed) {
         this.floormapId = floormapId;
@@ -27,39 +30,38 @@ class AssetSimulationService {
         return assets;
     }
 
-    updatePositions() {
+    updatePosition(position) {
+
+        if(position.floorMap != this.floormapId) {
+            return;
+        }
+        
         this.assets = this.assets.map((asset) => {
-            if(asset.id === 1) {
-
-                return { ...asset, x: asset.x };
-
+            if(asset.id == position.id) {
+                let x = Math.max(0, Math.min(position.x, this.floormapWidth));
+                let y = Math.max(0, Math.min(position.y, this.floormapWidth));
+                return { ...asset, x: x, y: y };
             }
 
-            let newX = asset.x + this.movementSpeed * asset.direction;
-            if (newX <= 0 || newX >= this.floormapWidth - 10) {
-                asset.direction *= -1;
-                newX = Math.min(Math.max(newX, 0), this.floormapWidth - 10);
-            }
-
-            return { ...asset, x: newX };
+            return { ...asset };
         });
 
         if (this.callback) {
             this.callback(this.assets); // Update the React state
         }
 
-        this.animationFrameId = requestAnimationFrame(() => this.updatePositions());
     }
 
     startSimulation(callback) {
         this.callback = callback;
-        this.animationFrameId = requestAnimationFrame(() => this.updatePositions());
+        mqttService.addListener((data) => {
+            this.updatePosition(JSON.parse(data));
+        });
+        mqttService.connect();
     }
 
     stopSimulation() {
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-        }
+        mqttService.disconnect();
     }
 }
 

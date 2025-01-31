@@ -266,10 +266,10 @@ function ZoneEditing() {
     const { id, name, color, x, y, width, height } = zoneData;
 
     // Scale back to real-world dimensions
-    const realX = x / scale;
-    const realY = y / scale;
-    const realWidth = width / scale;
-    const realHeight = height / scale;
+    const realX = x;
+    const realY = y;
+    const realWidth = width;
+    const realHeight = height;
 
     // Define all four corners of the rectangle
     const points = [
@@ -371,7 +371,8 @@ function ZoneEditing() {
         const savedZone = await ZoneService.updateZone(zone);
         console.log("Saved zone:", savedZone);
       }
-
+      
+      /*
       const updatedScaledZones = zonesToSave.map(
         (zone) => convertZonesForDisplay(zone, floormapId, 1 / floormapScale) // Scale zones back for display
       );
@@ -393,6 +394,7 @@ function ZoneEditing() {
       });
 
       setUpdatedZoneIndices(new Set());
+      */
     } catch (error) {
       console.error("Error updating zones:", error);
       alert(
