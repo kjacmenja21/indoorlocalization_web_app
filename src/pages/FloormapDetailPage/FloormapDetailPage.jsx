@@ -5,6 +5,7 @@ import AssetSimulationService from "../../services/assetSimulationService.js";
 import FloormapDisplay from "../../components/FloormapDisplay/FloormapDisplay.jsx";
 import AssetSelector from "../../components/AssetSelector/AssetSelector.jsx";
 import "./_floormapDetailPage.scss";
+import {cacheService} from "src/services/cacheService.js";
 
 function FloormapDetail() {
   const { floormapId } = useParams();
@@ -38,6 +39,13 @@ function FloormapDetail() {
     navigate(`/zone-editing/${floormapId}`);
   };
 
+  function handleDelete() {
+    FloorMapService.deleteFloorMap(floormapId).then(() => {
+      cacheService.clearCache("floormaps");
+      navigate("/");
+    });
+  }
+
   return (
     <div className="floormap-detail">
       <div className="header-section">
@@ -49,6 +57,7 @@ function FloormapDetail() {
           <button onClick={handleEditZone} className="edit-button">
             Edit Zones
           </button>
+          <button onClick={handleDelete}>Delete Floormap</button>
         </div>
       </div>
 
