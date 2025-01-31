@@ -1,88 +1,52 @@
-import mqtt from 'mqtt';
 
 class MqttService {
+
+    brokerUrl = `ws://adaptiq.up.railway.app/api/v1/mqtt/ws`;
+
     constructor() {
         this.client = null;
         this.listeners = [];
-        this.isSimulating = false;
     }
 
-    connect(brokerUrl, options = {}, simulate = false) {
+    connect() {
         if (!this.client) {
-            const optionsWithoutWs = {
-                ...options,
-                protocol: 'mqtt',
+
+            this.client = new WebSocket(this.brokerUrl);
+
+            this.client.onopen = () => {
+                console.log("Connected to WebSocket.");
             };
-            this.client = mqtt.connect(brokerUrl, optionsWithoutWs);
 
-            this.client.on('connect', () => {
-                console.log('Connected to MQTT broker via TCP!');
-                if (simulate) {
-                    this.startSimulating();
+            this.client.onmessage = (event) => {
+                //console.log("Message", event.data);
+                for(let listener of this.listeners) {
+                    listener(event.data);
                 }
-            });
+            };
 
-            this.client.on('error', (err) => {
-                console.error('MQTT connection error:', err);
-            });
+            this.client.onclose = () => {
+                console.log("WebSocket connection closed.");
+            };
 
-            this.client.on('message', (topic, message) => {
-                try {
-                    const data = JSON.parse(message.toString());
-                    this.listeners.forEach((callback) => callback(topic, data));
-                } catch (error) {
-                    console.error('Error parsing MQTT message:', error);
-                }
-            });
+            this.client.onerror = (error) => {
+                console.error("WebSocket error:", error);
+            };
+
         }
     }
 
-    startSimulating() {
-        if (!this.isSimulating) {
-            this.isSimulating = true;
-            let assetId = 1;
-            setInterval(() => {
-                const locationData = this.generateAssetLocation(assetId);
-                const topic = `assets/${assetId}/location`;
-                this.client.publish(topic, JSON.stringify(locationData));
-                console.log(`Simulated: Published to ${topic}: ${JSON.stringify(locationData)}`);
-                assetId = assetId < 5 ? assetId + 1 : 1; // Loop through 5 assets
-            }, 2000); // Simulate every 2 seconds
-        }
-    }
-
-    generateAssetLocation(assetId) {
-        const lat = Math.random() * 1000 % 199;
-        const lon = Math.random() * 1000 % 199;
-        return {
-            asset_id: assetId,
-            floormap_id: 1,
-            x: lat,
-            y: lon
-        };
-    }
-
-    subscribe(topic, callback) {
-        if (this.client) {
-            this.client.subscribe(topic, { qos: 0 }, (err) => {
-                if (err) {
-                    console.error('Subscription error:', err);
-                } else {
-                    console.log(`Subscribed to topic: ${topic}`);
-                }
-            });
-            this.listeners.push(callback);
-        }
+    addListener(callback) {
+        this.listeners.push(callback);
     }
 
     disconnect() {
         if (this.client) {
-            this.client.end();
+            this.client.close();
             this.client = null;
             this.listeners = [];
-            console.log('Disconnected from MQTT broker');
         }
     }
 }
 
 export const mqttService = new MqttService();
+console.log('init mqtt service');
