@@ -166,22 +166,39 @@ function TableReport() {
             </button>
           </div>
 
-          <ul className="table-report__list">
-            <li className="table-report__list-header">
-              <div className="table-report__column--asset">Asset</div>
-              <div className="table-report__column--zone">Zone</div>
-              <div className="table-report__column--time">Hours</div>
+          <ul className="responsive-table__list">
+            <li className="responsive-table__list-item responsive-table__list-item--header">
+              <div className="responsive-table__column responsive-table__column--1">
+                Asset
+              </div>
+              <div className="responsive-table__column responsive-table__column--2">
+                Zone
+              </div>
+              <div className="responsive-table__column responsive-table__column--3">
+                Hours
+              </div>
             </li>
-
             {tableReportData?.map((item, index) => (
-              <li key={index} className="table-report__list-row">
-                <div className="table-report__column--asset" data-label="Asset">
+              <li
+                key={index}
+                className="responsive-table__list-item responsive-table__list-item--row"
+              >
+                <div
+                  className="responsive-table__column responsive-table__column--1"
+                  data-label="Asset"
+                >
                   {item.assetName}
                 </div>
-                <div className="table-report__column--zone" data-label="Zone">
+                <div
+                  className="responsive-table__column responsive-table__column--2"
+                  data-label="Zone"
+                >
                   {item.zoneName}
                 </div>
-                <div className="table-report__column--time" data-label="Hours">
+                <div
+                  className="responsive-table__column responsive-table__column--3"
+                  data-label="Hours"
+                >
                   {item.timeSpent}
                 </div>
               </li>
