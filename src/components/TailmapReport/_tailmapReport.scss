@@ -82,7 +82,7 @@
 
   &__tailmap-container {
     margin: 2rem auto;
-    max-width: calc(800px + 2rem);
+    max-width: 90%;
   }
 
   &__header {
@@ -90,8 +90,6 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
-    padding: 0 1rem;
-    width: 800px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -127,14 +125,13 @@
     background: white;
     overflow: hidden;
     position: relative;
-    width: 800px;
+
     margin: 0 auto;
   }
 
   &__map-container {
     position: relative;
     user-select: none;
-    background: #f8f9fa;
     height: 600px;
 
     img {

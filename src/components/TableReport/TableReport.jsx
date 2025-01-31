@@ -118,8 +118,9 @@ function TableReport() {
 
   return (
     <div className="table-report">
-      <h1 className="table-report__title">Table Report</h1>
-
+      {!isTableReportVisible && (
+        <h1 className="table-report__title">Table Report</h1>
+      )}
       {!isTableReportVisible && (
         <div className="table-report__controls">
           <div className="table-report__form-group">
