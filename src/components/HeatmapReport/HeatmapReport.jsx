@@ -3,7 +3,7 @@ import ReactSelect from "react-select";
 import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import "./_heatmapReport.scss";
-import {cacheService} from "../../services/cacheService.js";
+import { cacheService } from "../../services/cacheService.js";
 
 function HeatmapReport() {
   const [floormaps, setFloormaps] = useState([]);
@@ -25,8 +25,8 @@ function HeatmapReport() {
     const fetchFloormaps = async () => {
       try {
         const data = await cacheService.fetchAndCache(
-            "floormaps",
-            FloorMapService.getAllFloorMaps
+          "floormaps",
+          FloorMapService.getAllFloorMaps
         );
         setFloormaps(data);
       } catch (error) {
@@ -59,7 +59,7 @@ function HeatmapReport() {
             itemsPerPage
           );
 
-          if (response && response.page && response.page.length > 0) {
+          if (response?.page?.length > 0) {
             allAssets = [...allAssets, ...response.page];
             page++;
             hasMoreAssets = page <= response.total_pages;
@@ -104,10 +104,7 @@ function HeatmapReport() {
 
         const assetHistoryMap = data.reduce((acc, { x, y }) => {
           const key = `${x},${y}`;
-
-          if (!acc[key]) {
-            acc[key] = { x, y, count: 0 };
-          }
+          acc[key] = acc[key] || { x, y, count: 0 };
           acc[key].count += 1;
           return acc;
         }, {});
@@ -120,7 +117,6 @@ function HeatmapReport() {
     );
 
     historyOfAssetPositions.push(...selectedAssetIds);
-
     setHeatmapData(historyOfAssetPositions);
     setIsHeatmapVisible(true);
   }
@@ -129,36 +125,32 @@ function HeatmapReport() {
     if (heatmapData && canvasRef.current) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
-
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       ctx.save();
       ctx.scale(zoom, zoom);
 
       heatmapData.forEach(({ positions }) => {
-        if (Array.isArray(positions) && positions.length > 0) {
-          positions.forEach(({ x, y, count }) => {
-            const normalizedX = (x / imageSize.width) * imageSize.width;
-            const normalizedY = (y / imageSize.height) * imageSize.height;
+        positions?.forEach(({ x, y, count }) => {
+          const normalizedX = (x / imageSize.width) * imageSize.width;
+          const normalizedY = (y / imageSize.height) * imageSize.height;
 
-            const radius = (count * 10) / zoom;
-            const gradient = ctx.createRadialGradient(
-              normalizedX,
-              normalizedY,
-              0,
-              normalizedX,
-              normalizedY,
-              radius
-            );
-            gradient.addColorStop(0, "rgba(255, 0, 0, 0.8)");
-            gradient.addColorStop(1, "rgba(255, 0, 0, 0)");
+          const radius = (count * 10) / zoom;
+          const gradient = ctx.createRadialGradient(
+            normalizedX,
+            normalizedY,
+            0,
+            normalizedX,
+            normalizedY,
+            radius
+          );
+          gradient.addColorStop(0, "rgba(255, 0, 0, 0.8)");
+          gradient.addColorStop(1, "rgba(255, 0, 0, 0)");
 
-            ctx.beginPath();
-            ctx.arc(normalizedX, normalizedY, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = gradient;
-            ctx.fill();
-          });
-        }
+          ctx.beginPath();
+          ctx.arc(normalizedX, normalizedY, radius, 0, 2 * Math.PI);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+        });
       });
 
       ctx.restore();
@@ -183,97 +175,116 @@ function HeatmapReport() {
     }
   };
 
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
-    <div>
-      <h1>Heatmap Report</h1>
-      <div style={{ marginBottom: "20px", width: "300px" }}>
-        <label>Select a Floor Map:</label>
-        <ReactSelect
-          options={floormapOptions}
-          onChange={handleFloormapSelect}
-          placeholder="Select a Floor Map"
-          styles={{
-            container: (base) => ({
-              ...base,
-              marginBottom: "10px",
-              width: "100%",
-            }),
-          }}
-        />
-      </div>
-      {selectedFloormap && (
-        <div style={{ marginBottom: "20px", width: "300px" }}>
-          <label>Select Assets:</label>
-          <ReactSelect
-            options={assetOptions}
-            isMulti
-            value={selectedAssets}
-            onChange={setSelectedAssets}
-            placeholder="Select Assets..."
-            styles={{
-              container: (base) => ({ ...base, width: "100%" }),
-            }}
-          />
+    <div className="heatmap-report">
+      {!isHeatmapVisible && (
+        <h1 className="heatmap-report__title">Heatmap Report</h1>
+      )}
+
+      {!isHeatmapVisible && (
+        <div className="heatmap-report__controls">
+          <div className="heatmap-report__form-group">
+            <label className="heatmap-report__label">Select a Floor Map:</label>
+            <ReactSelect
+              className="heatmap-report__select"
+              options={floormapOptions}
+              onChange={handleFloormapSelect}
+              placeholder="Select a Floor Map"
+            />
+          </div>
+
+          {selectedFloormap && (
+            <div className="heatmap-report__form-group">
+              <label className="heatmap-report__label">Select Assets:</label>
+              <ReactSelect
+                className="heatmap-report__select"
+                options={assetOptions}
+                isMulti
+                value={selectedAssets}
+                onChange={setSelectedAssets}
+                placeholder="Select Assets..."
+              />
+            </div>
+          )}
+
+          <button
+            className="heatmap-report__generate-btn"
+            onClick={handleHeatMapGeneration}
+          >
+            Generate Heatmap Report
+          </button>
         </div>
       )}
-      <button onClick={handleHeatMapGeneration}>Generate Heatmap Report</button>
 
       {isHeatmapVisible && heatmapData && (
-        <div
-          className="floormap-detail"
-          onMouseMove={handleMouseMove}
-          onMouseUp={() => setIsDragging(false)}
-          onMouseLeave={() => setIsDragging(false)}
-          style={{ userSelect: "none", overflow: "hidden" }}
-        >
-          <h2>Floormap Detail for {selectedFloormap.id}</h2>
+        <div className="heatmap-report__heatmap-container">
+          <div className="heatmap-report__header">
+            <h2 className="heatmap-report__subtitle">
+              Floormap Detail for {selectedFloormap.id}
+            </h2>
+            <button
+              className="heatmap-report__reload-btn"
+              onClick={handleReload}
+            >
+              New Report
+            </button>
+          </div>
+
           <div
-            className="floormap-container"
-            style={{
-              width: `${containerSize.width}px`,
-              height: `${containerSize.height}px`,
-              overflow: "hidden",
-              position: "relative",
-              border: "1px solid #ccc",
-              cursor: isDragging ? "grabbing" : "grab",
-            }}
-            onMouseDown={(e) => {
-              setIsDragging(true);
-              setDragStart({
-                x: e.clientX - position.x,
-                y: e.clientY - position.y,
-              });
-            }}
+            className="heatmap-report__map-wrapper"
+            onMouseMove={handleMouseMove}
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
           >
-            <img
-              src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
-              alt="Floor Map"
-              draggable={false}
+            <div
+              className="heatmap-report__map-container"
               style={{
-                width: `${imageSize.width}px`,
-                height: `${imageSize.height}px`,
-                position: "absolute",
-                top: position.y,
-                left: position.x,
-                transform: `scale(${zoom})`,
-                transformOrigin: "top left",
+                width: `${containerSize.width}px`,
+                height: `${containerSize.height}px`,
+                cursor: isDragging ? "grabbing" : "grab",
               }}
-            />
-            <canvas
-              ref={canvasRef}
-              width={imageSize.width}
-              height={imageSize.height}
-              style={{
-                position: "absolute",
-                top: position.y,
-                left: position.x,
-                width: `${imageSize.width}px`,
-                height: `${imageSize.height}px`,
-                transform: `scale(${zoom})`,
-                transformOrigin: "top left",
-                pointerEvents: "none",
+              onMouseDown={(e) => {
+                setIsDragging(true);
+                setDragStart({
+                  x: e.clientX - position.x,
+                  y: e.clientY - position.y,
+                });
               }}
-            />
+            >
+              <img
+                src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
+                alt="Floor Map"
+                draggable={false}
+                style={{
+                  width: `${imageSize.width}px`,
+                  height: `${imageSize.height}px`,
+                  position: "absolute",
+                  top: position.y,
+                  left: position.x,
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "top left",
+                }}
+              />
+              <canvas
+                ref={canvasRef}
+                width={imageSize.width}
+                height={imageSize.height}
+                style={{
+                  position: "absolute",
+                  top: position.y,
+                  left: position.x,
+                  width: `${imageSize.width}px`,
+                  height: `${imageSize.height}px`,
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "top left",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
