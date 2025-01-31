@@ -1,3 +1,6 @@
+@use "../../styles/variables" as *;
+@use "sass:color";
+
 .heatmap-report {
   padding: 20px;
   font-family: "Arial", sans-serif;
@@ -68,7 +71,7 @@
     margin-top: 1rem;
 
     &:hover {
-      background-color: darken(#5b6162, 10%);
+      background-color: color.adjust(#5b6162, $lightness: -10%);
       transform: translateY(-1px);
     }
   }
@@ -109,7 +112,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
     &:hover {
-      background: darken(#5b6162, 10%);
+      background: color.adjust(#5b6162, $lightness: -10%);
     }
   }
 
