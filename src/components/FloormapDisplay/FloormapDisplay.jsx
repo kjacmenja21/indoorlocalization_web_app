@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import AssetMarkers from "../AssetMarker/AssetMarker";
 
-function FloormapDisplay({ floormapId, assets, activeAsset, setActiveAsset }) {
+
+function FloormapDisplay({ image, assets, activeAsset, setActiveAsset }) {
   //const [activeAsset, setActiveAssetState] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -11,11 +12,9 @@ function FloormapDisplay({ floormapId, assets, activeAsset, setActiveAsset }) {
   const containerSize = { width: 800, height: 600 }; // Dimenzije kontejnera
   const imageSize = { width: 1600, height: 1100 }; // Dimenzije slike
 
-  // const setActiveAsset = useCallback((asset) => {
-  //   setActiveAssetState(asset);
-  // }, []);
-
+  //let imgSource;
   useEffect(() => {
+
     if (activeAsset) {
       const currentAsset = assets.find((asset) => asset.id === activeAsset.id);
       if (currentAsset) {
@@ -84,18 +83,23 @@ function FloormapDisplay({ floormapId, assets, activeAsset, setActiveAsset }) {
           });
         }}
       >
-        <img
-          src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
-          alt="Floor Map"
-          draggable={false}
-          style={{
-            position: "absolute",
-            top: position.y,
-            left: position.x,
-            transform: `scale(${zoom})`,
-            transformOrigin: "center",
-          }}
-        />
+        {image ? (
+            <img
+                src={image}
+                alt="Floor Map"
+                draggable={false}
+                style={{
+                  position: "absolute",
+                  top: position.y,
+                  left: position.x,
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "center",
+                }}
+            />
+        ) : (
+            <p>Loading image...</p>
+        )}
+
         <AssetMarkers
           assets={assets}
           zoom={zoom}

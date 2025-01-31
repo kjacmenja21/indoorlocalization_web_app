@@ -6,6 +6,8 @@ import FloormapDisplay from "../../components/FloormapDisplay/FloormapDisplay.js
 import AssetSelector from "../../components/AssetSelector/AssetSelector.jsx";
 import "./_floormapDetailPage.scss";
 import {cacheService} from "src/services/cacheService.js";
+import imageConverterService from "../../services/imageConverterService.js";
+
 
 function FloormapDetail() {
   const { floormapId } = useParams();
@@ -13,6 +15,9 @@ function FloormapDetail() {
   const [assets, setAssets] = useState([]);
   const [activeAsset, setActiveAssetState] = useState([]);
   const [floormapName, setFloormapName] = useState("");
+  const [floormap, setFloormap] = useState("");
+  const [imgSource, setImgSource] = useState("");
+
 
   const setActiveAsset = useCallback((asset) => {
     setActiveAssetState(asset);
@@ -25,6 +30,9 @@ function FloormapDetail() {
         return;
       }
       setFloormapName(floormap.name);
+      setFloormap(floormap);
+      setImgSource(imageConverterService.getFloorMapImageSource(floormap));
+
       let assetSimulationService = new AssetSimulationService(
         floormapId,
         floormap.width,
@@ -62,7 +70,7 @@ function FloormapDetail() {
       </div>
 
       <FloormapDisplay
-        floormapId={floormapId}
+        image={imgSource}
         assets={assets}
         activeAsset={activeAsset}
         setActiveAsset={setActiveAsset}
