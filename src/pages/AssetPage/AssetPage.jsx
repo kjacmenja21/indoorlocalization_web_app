@@ -7,27 +7,29 @@ import Pagination from "../../components/Pagination/Pagination.jsx";
 import "./_assetPage.scss";
 import { AssetPropType } from "../../core/types/assetPropType.js";
 import { FloorMapService } from "../../services/floormapService.js";
+import { cacheService } from "../../services/cacheService.js";
 
 function AssetPage() {
   const [assets, setAssets] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-
   const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchAssetsWithFloorMapNames = async () => {
       try {
         // Fetch paginated assets
-        const { page, total_pages } = await AssetService.getPaginatedAssets(
-            currentPage,
-            itemsPerPage
-        );
+        const { page, total_pages } = await AssetService.getPaginatedAssets(currentPage, itemsPerPage);
+        setTotalPages(total_pages); // Set total available pages
 
-        // Fetch floor maps for associated assets
+        // Extract unique floorMap IDs
         const floorMapIds = [...new Set(page.map((asset) => asset.floormap_id))];
+
+        // Fetch floor maps using caching service
         const floorMaps = await Promise.all(
-            floorMapIds.map((id) => FloorMapService.getFloorMapById(id))
+            floorMapIds.map(async (id) => {
+              return cacheService.fetchAndCache("floormaps", FloorMapService.getFloorMapById, id);
+            })
         );
 
         // Create a lookup dictionary for floor map names
@@ -42,9 +44,7 @@ function AssetPage() {
           floorMapName: floorMapIdToName[asset.floormap_id] || "Unknown Floor",
         }));
 
-        // Update state
         setAssets(assetsWithNames);
-        setTotalPages(total_pages); // Set total available pages
       } catch (error) {
         console.error("Error fetching assets or floor maps:", error.message);
       }
@@ -66,7 +66,18 @@ function AssetPage() {
     try {
       console.log("New asset:", newAsset);
       const addedAsset = await AssetService.addAsset(newAsset);
-      setAssets((prev) => [...prev, addedAsset]);
+
+      // Update cache when a new asset is added
+      cacheService.updateCache("assets", addedAsset, null, addedAsset.id);
+
+      // Fetch floor map name if needed
+      const floorMapName =
+          (addedAsset.floormap_id &&
+              (cacheService.cache.floormaps[addedAsset.floormap_id]?.name ||
+                  (await cacheService.fetchAndCache("floormaps", FloorMapService.getFloorMapById, addedAsset.floormap_id)).name)) ||
+          "Unknown Floor";
+
+      setAssets((prev) => [...prev, { ...addedAsset, floorMapName }]);
     } catch (error) {
       console.error("Error adding asset:", error.message);
     }
@@ -87,11 +98,7 @@ function AssetPage() {
 
         <AssetTable assets={assets} />
 
-        <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-        />
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
       </div>
   );
 }
