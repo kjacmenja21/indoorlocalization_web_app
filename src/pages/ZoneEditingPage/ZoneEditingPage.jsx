@@ -111,10 +111,10 @@ function ZoneEditing() {
         id: zone.id,
         name: zone.name,
         color: `#${zone.color.toString(16).padStart(6, "0")}`, // Convert color to hex
-        x: minX * scale,
-        y: minY * scale,
-        width: width * scale,
-        height: height * scale,
+        x: minX,
+        y: minY,
+        width: width,
+        height: height,
       };
     }
     return zones.map((zone) => {
@@ -133,10 +133,10 @@ function ZoneEditing() {
         id: zone.id,
         name: zone.name,
         color: `#${zone.color.toString(16).padStart(6, "0")}`, // Convert color to hex
-        x: minX * scale,
-        y: minY * scale,
-        width: width * scale,
-        height: height * scale,
+        x: minX,
+        y: minY,
+        width: width,
+        height: height,
       };
     });
   };
@@ -375,7 +375,7 @@ function ZoneEditing() {
 
     try {
       for (const zone of zonesToSave) {
-        console.log(zone);
+        console.log("ZONE", zone);
         const savedZone = await ZoneService.updateZone(zone);
         console.log("Saved zone:", savedZone);
       }
@@ -468,7 +468,28 @@ function ZoneEditing() {
         >
           {`Save Changes (${updatedZoneIndices.size})`}
         </button>
-        <div className="stage-container" ref={containerRef}>
+        <div className="stage-container" style={{position: "relative"}} ref={containerRef}>
+
+        {zoneImage ? (
+            <img
+                src={zoneImage}
+                alt="Floor Map"
+                draggable={false}
+                style={{
+                  zIndex: -1,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: stageSize.width,
+                  height: stageSize.height,
+                  transform: `scale(1)`,
+                  transformOrigin: "center",
+                }}
+            />
+        ) : (
+            <p>Loading image...</p>
+        )}
+
           <ZoneStage
             stageSize={stageSize}
             zones={scaledZones}
