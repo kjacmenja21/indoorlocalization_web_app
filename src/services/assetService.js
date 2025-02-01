@@ -103,24 +103,6 @@ export const AssetService = {
         }
     },
 
-    deleteAsset: async (assetId) => {
-        /*
-       try{
-           const response = await axiosInstance.delete('API_PATHS.ASSETS_DELETE/${assetId}');
-           return response.data;
-       } catch (error) {
-           const errorMessage = error.response?.data?.message || error.message || 'Failed to delete assets';
-           console.error(`Error fetching assets: ${errorMessage}`);
-       }*/
-        const assetIndex = assetList.findIndex(asset => asset.id === assetId);
-        if (assetIndex === -1) {
-            throw new Error(`Asset with ID ${assetId} not found.`);
-        }
-        // Remove asset from the list
-        const deletedAsset = assetList.splice(assetIndex, 1)[0];
-        return deletedAsset;
-    },
-
     addAsset: async (newAsset) => {
         try {
             const response = await axiosInstance.post(API_PATHS.ASSETS_POST, newAsset);

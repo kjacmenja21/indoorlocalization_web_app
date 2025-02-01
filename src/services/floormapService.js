@@ -119,7 +119,7 @@ export const FloorMapService = {
 
     deleteFloorMap: async (floorMapId) => {
         try {
-            const response = await axiosInstance.delete(`floormaps/${floorMapId}`);
+            const response = await axiosInstance.delete(`${API_PATHS.FLOORMAPS_DELETE}${floorMapId}`);
             return response.data;
         } catch (error) {
             console.error("Error deleting floor map:", error.message);
