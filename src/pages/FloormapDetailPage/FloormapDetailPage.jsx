@@ -70,6 +70,8 @@ function FloormapDetail() {
       </div>
 
       <FloormapDisplay
+        width={floormap.width}
+        height={floormap.height}
         image={imgSource}
         assets={assets}
         activeAsset={activeAsset}
