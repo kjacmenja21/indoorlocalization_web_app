@@ -6,6 +6,7 @@ import ZoneStage from "../../components/ZoneStage/ZoneStage.jsx";
 import ZoneMenu from "../../components/ZoneMenu/ZoneMenu.jsx";
 import { ZoneService } from "../../services/zoneService.js";
 import "./_zoneEditingPage.scss";
+import imageConverterService from "src/services/imageConverterService.js";
 
 function ZoneEditing() {
   const { floormapId } = useParams();
@@ -24,12 +25,19 @@ function ZoneEditing() {
   const [realWorldZones, setRealWorldZones] = useState([]);
   const [scaledZones, setScaledZones] = useState([]);
   const [backendZones, setBackendZones] = useState([]);
+  const [zoneImage, setZoneImage] = useState(null);
 
   useEffect(() => {
     FloorMapService.getFloorMapById(floormapId)
       .then((floormap) => {
         console.log(`Fetched floormap details for ID ${floormapId}:`, floormap);
         setFloormap(floormap);
+        if(floormap) {
+          const zoneImage = imageConverterService.getFloorMapImageSource(floormap)
+          if(zoneImage) {
+            setZoneImage(zoneImage);
+          }
+        } // floormap.width, floormap.height
 
         // Fetch zones associated with the floormap
         ZoneService.getZones(floormapId)
