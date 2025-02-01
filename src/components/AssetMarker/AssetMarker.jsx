@@ -62,6 +62,7 @@ const AssetMarkers = ({
       onMouseLeave={handleMouseUp} // Zaustavlja drag ako miš izađe iz područja
     >
       {assets.map((asset) => (
+        
         <div
           key={asset.id}
           onMouseDown={(e) => handleMouseDown(e, asset)}
@@ -77,7 +78,14 @@ const AssetMarkers = ({
             transform: "translate(-50%, -50%)",
             cursor: "pointer",
           }}
-        />
+        >
+          <p style={{
+            width: "200px",
+            height: "20px",
+            margin: "0",
+            transform: "translate(15px, -5px)"
+          }}>Asset name</p>
+        </div>
       ))}
     </div>
   );
