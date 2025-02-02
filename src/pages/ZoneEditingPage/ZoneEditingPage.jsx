@@ -6,6 +6,7 @@ import ZoneStage from "../../components/ZoneStage/ZoneStage.jsx";
 import ZoneMenu from "../../components/ZoneMenu/ZoneMenu.jsx";
 import { ZoneService } from "../../services/zoneService.js";
 import "./_zoneEditingPage.scss";
+import imageConverterService from "src/services/imageConverterService.js";
 
 function ZoneEditing() {
   const { floormapId } = useParams();
@@ -24,12 +25,19 @@ function ZoneEditing() {
   const [realWorldZones, setRealWorldZones] = useState([]);
   const [scaledZones, setScaledZones] = useState([]);
   const [backendZones, setBackendZones] = useState([]);
+  const [zoneImage, setZoneImage] = useState(null);
 
   useEffect(() => {
     FloorMapService.getFloorMapById(floormapId)
       .then((floormap) => {
         console.log(`Fetched floormap details for ID ${floormapId}:`, floormap);
         setFloormap(floormap);
+        if(floormap) {
+          const zoneImage = imageConverterService.getFloorMapImageSource(floormap)
+          if(zoneImage) {
+            setZoneImage(zoneImage);
+          }
+        } // floormap.width, floormap.height
 
         // Fetch zones associated with the floormap
         ZoneService.getZones(floormapId)
@@ -103,10 +111,10 @@ function ZoneEditing() {
         id: zone.id,
         name: zone.name,
         color: `#${zone.color.toString(16).padStart(6, "0")}`, // Convert color to hex
-        x: minX * scale,
-        y: minY * scale,
-        width: width * scale,
-        height: height * scale,
+        x: minX,
+        y: minY,
+        width: width,
+        height: height,
       };
     }
     return zones.map((zone) => {
@@ -125,10 +133,10 @@ function ZoneEditing() {
         id: zone.id,
         name: zone.name,
         color: `#${zone.color.toString(16).padStart(6, "0")}`, // Convert color to hex
-        x: minX * scale,
-        y: minY * scale,
-        width: width * scale,
-        height: height * scale,
+        x: minX,
+        y: minY,
+        width: width,
+        height: height,
       };
     });
   };
@@ -367,7 +375,7 @@ function ZoneEditing() {
 
     try {
       for (const zone of zonesToSave) {
-        console.log(zone);
+        console.log("ZONE", zone);
         const savedZone = await ZoneService.updateZone(zone);
         console.log("Saved zone:", savedZone);
       }
@@ -460,7 +468,28 @@ function ZoneEditing() {
         >
           {`Save Changes (${updatedZoneIndices.size})`}
         </button>
-        <div className="stage-container" ref={containerRef}>
+        <div className="stage-container" style={{position: "relative"}} ref={containerRef}>
+
+        {zoneImage ? (
+            <img
+                src={zoneImage}
+                alt="Floor Map"
+                draggable={false}
+                style={{
+                  zIndex: -1,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: stageSize.width,
+                  height: stageSize.height,
+                  transform: `scale(1)`,
+                  transformOrigin: "center",
+                }}
+            />
+        ) : (
+            <p>Loading image...</p>
+        )}
+
           <ZoneStage
             stageSize={stageSize}
             zones={scaledZones}

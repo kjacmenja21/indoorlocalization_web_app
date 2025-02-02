@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import AssetMarkers from "../AssetMarker/AssetMarker";
 
 
-function FloormapDisplay({ image, assets, activeAsset, setActiveAsset }) {
+function FloormapDisplay({ width, height, image, assets, activeAsset, setActiveAsset }) {
   //const [activeAsset, setActiveAssetState] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -10,7 +10,7 @@ function FloormapDisplay({ image, assets, activeAsset, setActiveAsset }) {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const containerSize = { width: 800, height: 600 }; // Dimenzije kontejnera
-  const imageSize = { width: 1600, height: 1100 }; // Dimenzije slike
+  const imageSize = { width, height }; // Dimenzije slike
 
   //let imgSource;
   useEffect(() => {
