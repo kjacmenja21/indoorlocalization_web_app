@@ -6,6 +6,7 @@ import ZoneStage from "../../components/ZoneStage/ZoneStage.jsx";
 import ZoneMenu from "../../components/ZoneMenu/ZoneMenu.jsx";
 import { ZoneService } from "../../services/zoneService.js";
 import "./_zoneEditingPage.scss";
+import imageConverterService from "src/services/imageConverterService.js";
 
 function ZoneEditing() {
   const { floormapId } = useParams();
@@ -23,12 +24,20 @@ function ZoneEditing() {
   const [realWorldZones, setRealWorldZones] = useState([]);
   const [scaledZones, setScaledZones] = useState([]);
   const [backendZones, setBackendZones] = useState([]);
+  const [zoneImage, setZoneImage] = useState(null);
 
   useEffect(() => {
     FloorMapService.getFloorMapById(floormapId)
       .then((floormap) => {
         console.log(`Fetched floormap details for ID ${floormapId}:`, floormap);
         setFloormap(floormap);
+
+        if (floormap) {
+          const zoneImage = imageConverterService.getFloorMapImageSource(floormap);
+          if (zoneImage) {
+            setZoneImage(zoneImage);
+          }
+        }
 
         // Fetch zones associated with the floormap
         ZoneService.getZones(floormapId)
@@ -63,6 +72,7 @@ function ZoneEditing() {
           containerWidth / stageWidth,
           containerHeight / stageHeight
         );
+
         console.log("Stage size:", stageWidth, stageHeight);
         setStageSize({
           width: stageWidth * scaleFactor,
@@ -80,11 +90,11 @@ function ZoneEditing() {
   useEffect(() => {
     console.log("Backend zones:", backendZones);
     setScaledZones(convertZonesForDisplay(backendZones, floormapScale));
-    console.log("Scaled zones:", scaledZones);
   }, [floormapScale, backendZones]);
 
   const convertZonesForDisplay = (zones, scale = 1) => {
     if (!Array.isArray(zones) && typeof zones === "object") {
+      // Single zone object
       console.log("convert: ", zones);
       const zone = zones.zone;
       const minX = Math.min(...zone.points.map((p) => p.x));
@@ -98,13 +108,15 @@ function ZoneEditing() {
       return {
         id: zone.id,
         name: zone.name,
-        color: `#${zone.color.toString(16).padStart(6, "0")}`,
+        color: `#${zone.color.toString(16).padStart(6, "0")}`, // Convert color to hex
         x: minX * scale,
         y: minY * scale,
         width: width * scale,
         height: height * scale,
       };
     }
+
+    // Array of zones
     return zones.map((zone) => {
       const minX = Math.min(...zone.points.map((p) => p.x));
       const minY = Math.min(...zone.points.map((p) => p.y));
@@ -117,7 +129,7 @@ function ZoneEditing() {
       return {
         id: zone.id,
         name: zone.name,
-        color: `#${zone.color.toString(16).padStart(6, "0")}`,
+        color: `#${zone.color.toString(16).padStart(6, "0")}`, // Convert color to hex
         x: minX * scale,
         y: minY * scale,
         width: width * scale,
@@ -181,7 +193,9 @@ function ZoneEditing() {
       return;
     }
     console.log("New zone to submit:", newZone);
+
     let newZoneData = { ...newZone, name: zoneName };
+    // Check overlap
     for (const zone of scaledZones) {
       if (areZonesOverlapping(newZoneData, zone)) {
         console.log("Overlapping zones:", newZoneData, zone);
@@ -191,6 +205,7 @@ function ZoneEditing() {
         return;
       }
     }
+
     newZoneData = {
       name: zoneName,
       color: newZone.color,
@@ -199,13 +214,13 @@ function ZoneEditing() {
       width: newZone.width,
       height: newZone.height,
     };
-    const savedZoneData = newZoneData;
-    newZoneData = convertZoneData(newZoneData, floormapId, floormapScale);
 
-    console.log("Zone submitted:", newZoneData);
+    // Convert for backend
+    const backendPayload = convertZoneData(newZoneData, floormapId, floormapScale);
+    console.log("Zone submitted:", backendPayload);
+
     try {
-      const savedZone = await ZoneService.addZone(newZoneData);
-
+      const savedZone = await ZoneService.addZone(backendPayload);
       if (savedZone) {
         const savedZoneData = convertZonesForDisplay(savedZone, floormapScale);
         const updatedZones = [...scaledZones, savedZoneData];
@@ -247,13 +262,14 @@ function ZoneEditing() {
     const bx2 = zoneB.x + zoneB.width;
     const by2 = zoneB.y + zoneB.height;
 
-    console.log("ax1:", ax1, "ay1:", ay1, "ax2:", ax2, "ay2:", ay2);
     return !(ax2 <= bx1 || bx2 <= ax1 || ay2 <= by1 || by2 <= ay1);
   };
 
   const convertZoneData = (zoneData, floorMapId, scale) => {
     const { id, name, color, x, y, width, height } = zoneData;
 
+    // These are already scaled to "stage" coords, but we treat them as the real coords
+    // unless you specifically want to further divide by scale.
     const realX = x;
     const realY = y;
     const realWidth = width;
@@ -287,8 +303,6 @@ function ZoneEditing() {
     updatedScaledZones[index] = updatedScaledZone;
     setScaledZones(updatedScaledZones);
 
-    console.log("Zone updated:", { updatedRealWorldZone, updatedScaledZone });
-
     setUpdatedZoneIndices((prevSet) => {
       const newSet = new Set(prevSet);
       newSet.add(index);
@@ -301,9 +315,7 @@ function ZoneEditing() {
       (index) => scaledZones[index]
     );
 
-    console.log("Checking overlaps among updated zones:", updatedZonesArray);
-    console.log("updatedScaledZones:", scaledZones);
-
+    // Check for overlap among zones being updated and all scaledZones
     for (let i = 0; i < updatedZonesArray.length; i++) {
       for (let j = 0; j < scaledZones.length; j++) {
         if (
@@ -311,7 +323,7 @@ function ZoneEditing() {
           updatedZonesArray[i].name !== scaledZones[j].name
         ) {
           alert(
-            `Zones "${updatedZonesArray[i].name}" and "${scaledZones[j].name}" overlap. Please resolve the conflict before saving.`
+            `Zones "${updatedZonesArray[i].name}" and "${scaledZones[j].name}" overlap. Please resolve before saving.`
           );
           return;
         }
@@ -323,19 +335,15 @@ function ZoneEditing() {
     );
 
     console.log("Saving updated zones to backend:", zonesToSave);
-
     try {
       for (const zone of zonesToSave) {
-        console.log(zone);
         const savedZone = await ZoneService.updateZone(zone);
         console.log("Saved zone:", savedZone);
       }
       setUpdatedZoneIndices(new Set());
     } catch (error) {
       console.error("Error updating zones:", error);
-      alert(
-        "An error occurred while updating the zones. Please try again later."
-      );
+      alert("An error occurred while updating the zones. Please try again later.");
     }
   };
 
@@ -345,12 +353,9 @@ function ZoneEditing() {
       return;
     }
 
-    const finalizedZone = {
-      ...updatedZone,
-      name: zoneName,
-    };
-
+    const finalizedZone = { ...updatedZone, name: zoneName };
     const newRealWorldZone = convertZoneToRealWorld(finalizedZone);
+
     setRealWorldZones((prevZones) => [...prevZones, newRealWorldZone]);
     setScaledZones((prevZones) => [...prevZones, finalizedZone]);
     setNewZone(null);
@@ -360,10 +365,7 @@ function ZoneEditing() {
     setIsFinishedDrawing(false);
 
     console.log("New zone added:", finalizedZone);
-    console.log(
-      "Converted zone for backend:",
-      convertZoneData(finalizedZone, floormapId)
-    );
+    console.log("Converted zone for backend:", convertZoneData(finalizedZone, floormapId));
   };
 
   const handleDeleteZone = (zoneId) => {
@@ -378,13 +380,12 @@ function ZoneEditing() {
         console.error(`Error deleting zone with ID ${zoneId}:`, error);
       });
   };
+
   return (
     <div className="zone-editing">
       <div className="zone-editing__container">
         <div className="zone-editing__header">
-          <h2 className="zone-editing__title">
-            Floormap Detail for {floormapId}
-          </h2>
+          <h2 className="zone-editing__title">Floormap Detail for {floormapId}</h2>
           <div className="zone-editing__actions">
             <button
               className={`zone-editing__button ${
@@ -405,7 +406,31 @@ function ZoneEditing() {
         </div>
 
         <div className="zone-editing__content">
-          <div className="zone-editing__stage" ref={containerRef}>
+          <div
+            className="zone-editing__stage"
+            ref={containerRef}
+            style={{ position: "relative" }}
+          >
+            {zoneImage ? (
+              <img
+                src={zoneImage}
+                alt="Floor Map"
+                draggable={false}
+                style={{
+                  zIndex: -1,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: stageSize.width,
+                  height: stageSize.height,
+                  transform: `scale(1)`,
+                  transformOrigin: "center",
+                }}
+              />
+            ) : (
+              <p>Loading image...</p>
+            )}
+
             <ZoneStage
               stageSize={stageSize}
               zones={scaledZones}
@@ -419,6 +444,7 @@ function ZoneEditing() {
               onDeleteZone={handleDeleteZone}
             />
           </div>
+
           <div className="zone-editing__sidebar">
             <ZoneMenu
               isDrawing={isDrawing}
@@ -435,6 +461,7 @@ function ZoneEditing() {
       </div>
     </div>
   );
-} // Zatvaranje komponente
+}
 
-export default ZoneEditing; // Export nakon zatvaranja komponente
+export default ZoneEditing;
+
