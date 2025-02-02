@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ZoneEditor from "../ZoneEditor/ZoneEditor.jsx";
 import { Layer, Stage } from "react-konva";
+import "./_zoneStage.scss";
 
 const ZoneStage = ({
   stageSize,
@@ -18,7 +19,6 @@ const ZoneStage = ({
   const [selectedZoneId, setSelectedZoneId] = useState(null);
 
   const handleZoneClick = (zoneId) => {
-    // Toggle selection of the clicked zone
     setSelectedZoneId(zoneId === selectedZoneId ? null : zoneId);
   };
 
@@ -31,14 +31,15 @@ const ZoneStage = ({
         )
       ) {
         onDeleteZone(selectedZoneId);
-        setSelectedZoneId(null); // Deselect after deletion
+        setSelectedZoneId(null);
       }
     }
   };
 
   return (
-    <div>
+    <div className="zone-stage">
       <Stage
+        className="zone-stage__canvas"
         width={stageSize.width}
         height={stageSize.height}
         onMouseDown={onMouseDown}
@@ -53,8 +54,8 @@ const ZoneStage = ({
               onUpdate={(updatedZone) => onZoneUpdate(index, updatedZone)}
               isEditable={isEditable}
               stageSize={stageSize}
-              isSelected={zone.id === selectedZoneId} // Pass selection status
-              onClick={() => handleZoneClick(zone.id)} // Handle zone click
+              isSelected={zone.id === selectedZoneId}
+              onClick={() => handleZoneClick(zone.id)}
             />
           ))}
           {newZone && (
@@ -70,12 +71,8 @@ const ZoneStage = ({
 
       {selectedZoneId && (
         <button
+          className="zone-stage__delete-button"
           onClick={handleDeleteClick}
-          style={{
-            position: "absolute",
-            top: 10,
-            left: 10,
-          }}
         >
           Delete Zone
         </button>
