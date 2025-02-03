@@ -10,12 +10,12 @@ NPM_CONFIG_UPDATE_NOTIFIER = 'false' # the update notification is relatively use
 NPM_CONFIG_FUND = 'false' # the fund notification is also pretty useless in a production environment
 [phases.build]
 dependsOn = ['install']
-cmds = ['npm run build --omit=dev']
+cmds = ['npm run build']
 cacheDirectories = ['node_modules/.cache']
 
 [phases.install]
 dependsOn = ['setup']
-cmds = ['npm ci --legacy-peer-deps']
+cmds = ['npm ci']
 cacheDirectories = ['/root/.npm']
 paths = ['/app/node_modules/.bin']
 
