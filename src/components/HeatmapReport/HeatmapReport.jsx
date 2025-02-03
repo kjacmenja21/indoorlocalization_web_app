@@ -4,6 +4,7 @@ import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import "./_heatmapReport.scss";
 import { cacheService } from "../../services/cacheService.js";
+import imageConverterService from "src/services/imageConverterService.js";
 
 function HeatmapReport() {
   const [floormaps, setFloormaps] = useState([]);
@@ -19,7 +20,8 @@ function HeatmapReport() {
   const canvasRef = useRef(null);
 
   const containerSize = { width: 800, height: 600 };
-  const imageSize = { width: 1600, height: 1100 };
+  const [imageSize, setImageSize] = useState({ width: 1600, height: 1100 });
+  const [imgSource, setImgSource] = useState("");
 
   useEffect(() => {
     const fetchFloormaps = async () => {
@@ -92,6 +94,11 @@ function HeatmapReport() {
   }
 
   async function handleHeatMapGeneration() {
+    FloorMapService.getFloorMapById(selectedFloormap.id).then((data) => {
+        setImageSize({ width: data.width, height: data.height });
+        setImgSource(imageConverterService.getFloorMapImageSource(data));
+
+    });
     const historyOfAssetPositions = [];
 
     const selectedAssetIds = await Promise.all(
@@ -122,7 +129,7 @@ function HeatmapReport() {
   }
 
   useEffect(() => {
-    if (heatmapData && canvasRef.current) {
+    if (heatmapData && canvasRef.current && imageSize) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -241,49 +248,57 @@ function HeatmapReport() {
             onMouseLeave={() => setIsDragging(false)}
           >
             <div
-              className="heatmap-report__map-container"
-              style={{
-                width: `${containerSize.width}px`,
-                height: `${containerSize.height}px`,
-                cursor: isDragging ? "grabbing" : "grab",
-              }}
-              onMouseDown={(e) => {
-                setIsDragging(true);
-                setDragStart({
-                  x: e.clientX - position.x,
-                  y: e.clientY - position.y,
-                });
-              }}
+                className="heatmap-report__map-container"
+                style={{
+                  width: `${containerSize.width}px`,
+                  height: `${containerSize.height}px`,
+                  cursor: isDragging ? "grabbing" : "grab",
+                }}
+                onMouseDown={(e) => {
+                  setIsDragging(true);
+                  setDragStart({
+                    x: e.clientX - position.x,
+                    y: e.clientY - position.y,
+                  });
+                }}
             >
-              <img
-                src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
-                alt="Floor Map"
-                draggable={false}
-                style={{
-                  width: `${imageSize.width}px`,
-                  height: `${imageSize.height}px`,
-                  position: "absolute",
-                  top: position.y,
-                  left: position.x,
-                  transform: `scale(${zoom})`,
-                  transformOrigin: "top left",
-                }}
-              />
-              <canvas
-                ref={canvasRef}
-                width={imageSize.width}
-                height={imageSize.height}
-                style={{
-                  position: "absolute",
-                  top: position.y,
-                  left: position.x,
-                  width: `${imageSize.width}px`,
-                  height: `${imageSize.height}px`,
-                  transform: `scale(${zoom})`,
-                  transformOrigin: "top left",
-                  pointerEvents: "none",
-                }}
-              />
+              {imgSource ? (
+                  <img
+                      src={imgSource}
+                      alt="Floor Map"
+                      draggable={false}
+                      style={{
+                        width: `${imageSize.width}px`,
+                        height: `${imageSize.height}px`,
+                        position: "absolute",
+                        top: position.y,
+                        left: position.x,
+                        transform: `scale(${zoom})`,
+                        transformOrigin: "top left",
+                      }}
+                  />
+              ) : (
+                  <p>Loading image...</p>
+              )}
+              {imageSize ? (
+                  <canvas
+                      ref={canvasRef}
+                      width={imageSize.width}
+                      height={imageSize.height}
+                      style={{
+                        position: "absolute",
+                        top: position.y,
+                        left: position.x,
+                        width: `${imageSize.width}px`,
+                        height: `${imageSize.height}px`,
+                        transform: `scale(${zoom})`,
+                        transformOrigin: "top left",
+                        pointerEvents: "none",
+                      }}/>
+                ) : (
+                <p>Loading image...</p>
+                )}
+
             </div>
           </div>
         </div>
