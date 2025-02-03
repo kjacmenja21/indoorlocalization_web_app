@@ -1,0 +1,108 @@
+.home-page {
+  &__content {
+    max-width: 95%;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  &__search {
+    width: 100%;
+    margin-bottom: 1rem;
+    display: flex;
+
+    &-input {
+      margin: 15px 0px;
+      width: 100%;
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      transition: border-color 0.2s ease-in-out;
+
+      &:focus {
+        outline: none;
+        border-color: rgb(0, 149, 218);
+        box-shadow: 0 0 0 2px rgba(0, 149, 218, 0.1);
+      }
+
+      &::placeholder {
+        color: #999;
+      }
+    }
+  }
+
+  &__title {
+    color: #5b6162;
+    font-size: 1.5rem;
+  }
+
+  &__floormap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  &__floormap-item {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+
+  &__floormap-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  &__floormap-name {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #333;
+    margin: 1rem 0;
+  }
+
+  &__floormap-button {
+    display: block;
+    width: 80%;
+    margin: 1rem auto;
+    padding: 0.5rem;
+    background: linear-gradient(to bottom, rgb(0, 149, 218), rgb(0, 149, 218));
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover {
+      background: linear-gradient(
+        to bottom,
+        rgb(0, 129, 198),
+        rgb(0, 129, 198)
+      );
+    }
+  }
+
+  &__no-floormaps {
+    text-align: center;
+    color: #333;
+    font-size: 1.2rem;
+    width: 100%;
+  }
+}

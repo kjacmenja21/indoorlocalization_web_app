@@ -1,0 +1,14 @@
+@use "../../styles/variables";
+
+.report-page {
+  &__header {
+  }
+
+  &__title {
+    color: #5b6162;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 1rem 0;
+  }
+}

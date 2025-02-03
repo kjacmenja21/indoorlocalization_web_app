@@ -1,0 +1,191 @@
+@use "../../styles/variables" as *;
+@use "sass:color";
+
+.table-report {
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+
+  &__title {
+    color: #5b6162;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    padding: 0 1rem;
+  }
+
+  &__controls {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 93%;
+    margin-bottom: 2rem;
+  }
+
+  &__form-group {
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #5b6162;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  &__select {
+    width: 100%;
+
+    .react-select__control {
+      border-radius: 4px;
+      border-color: #ced4da;
+      transition: border-color 0.2s;
+      width: 100%;
+
+      &:hover {
+        border-color: #adb5bd;
+      }
+    }
+
+    .react-select__menu {
+      border-radius: 4px;
+      margin-top: 4px;
+      width: 100%;
+    }
+  }
+
+  &__generate-btn {
+    background-color: #5b6162;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    font-weight: 500;
+    width: 100%;
+    margin-top: 1rem;
+
+    &:hover {
+      background-color: color.adjust(#5b6162, $lightness: -10%);
+      transform: translateY(-1px);
+    }
+  }
+
+  &__container {
+    margin: 2rem auto;
+    max-width: 90%;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5rem;
+  }
+
+  &__subtitle {
+    color: #5b6162;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  &__reload-btn {
+    background: #5b6162;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background: color.adjust(#5b6162, $lightness: -10%);
+    }
+  }
+}
+
+.responsive-table {
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    &-item {
+      border-radius: 3px;
+      padding: 25px 30px;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+
+      &--header {
+        background-color: #d5dada;
+        color: #2c3e50;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+
+      &--row {
+        background-color: #ffffff;
+        box-shadow: 0px 0px 9px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  &__column {
+    &--asset {
+      flex: 2;
+      padding: 0 1rem;
+    }
+    &--zone {
+      flex: 2;
+      padding: 0 1rem;
+    }
+    &--time {
+      flex: 1;
+      text-align: right;
+      padding: 0 1rem;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      width: 100%;
+      padding: 0.5rem 0;
+
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #5b6162;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__list-header {
+      display: none;
+    }
+    &__list-row {
+      flex-direction: column;
+      padding: 1rem;
+    }
+  }
+}
+
+.react-select__indicator-separator {
+  background-color: #ced4da !important;
+}
+
+.react-select__dropdown-indicator {
+  color: #5b6162 !important;
+}

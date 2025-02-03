@@ -1,0 +1,105 @@
+.add-floormap-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+  box-shadow: rgba(149, 157, 165, 0.2) 2px 8px 24px;
+  box-sizing: border-box;
+  padding: 0 20px 20px 20px;
+
+  &__title {
+    color: #222;
+    font-family: sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-top: 30px;
+  }
+
+  &__input-group {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin-top: 20px;
+
+    &:first-child {
+      margin-top: 30px;
+    }
+  }
+
+  &__input {
+    background: #fff;
+    border: none;
+    border-radius: 5px;
+    color: #808097;
+    font-size: 16px;
+    height: 100%;
+    padding: 4px 20px 0;
+    width: 100%;
+    box-shadow: rgba(149, 157, 165, 0.2) 2px 8px 24px;
+    box-sizing: border-box;
+    outline: none;
+
+    &:focus {
+      border: none;
+    }
+
+    &:focus ~ .add-floormap-form__placeholder,
+    &:not(:placeholder-shown) ~ .add-floormap-form__placeholder {
+      transform: translateY(-30px) translateX(10px) scale(0.75);
+      color: #65657b;
+    }
+
+    &:not(:placeholder-shown) ~ .add-floormap-form__placeholder {
+      color: #65657b;
+    }
+  }
+
+  &__placeholder {
+    position: absolute;
+    left: 20px;
+    top: 16px;
+    font-family: sans-serif;
+    color: #65657b;
+    font-size: 14px;
+    line-height: 14px;
+    transform-origin: 0 50%;
+    pointer-events: none;
+    transition: transform 200ms, color 200ms;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    width: 100%;
+  }
+
+  &__button {
+    background-color: #08d;
+    border: none;
+    border-radius: 5px;
+    color: #eee;
+    font-size: 16px;
+    height: 40px;
+    cursor: pointer;
+    text-align: center;
+    width: 45%;
+
+    &--submit {
+      background-color: #16a34a;
+
+      &:active {
+        background-color: #13873e;
+      }
+    }
+
+    &--cancel {
+      background-color: #c92e50;
+
+      &:active {
+        background-color: #8e1b32;
+      }
+    }
+  }
+}
