@@ -13,9 +13,8 @@ const Login = () => {
     setError(""); // Clear any existing errors
     try {
       const response = await AuthService.login(username, password);
-      console.log("Login successful:", response);
-      // Redirect to dashboard or another page after successful login
-      window.location.href = "/dashboard";
+
+      window.location.href = "/";
     } catch (err) {
       setError(err.message);
     }
