@@ -1,14 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AssetMarkers from "../AssetMarker/AssetMarker";
 
-function FloormapDisplay({
-  width,
-  height,
-  image,
-  assets,
-  activeAsset,
-  setActiveAsset,
-}) {
+function FloormapDisplay({ width, height, image, assets, activeAsset, setActiveAsset }) {
   //const [activeAsset, setActiveAssetState] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -20,6 +13,7 @@ function FloormapDisplay({
 
   //let imgSource;
   useEffect(() => {
+
     if (activeAsset) {
       const currentAsset = assets.find((asset) => asset.id === activeAsset.id);
       if (currentAsset) {
@@ -89,20 +83,20 @@ function FloormapDisplay({
         }}
       >
         {image ? (
-          <img
-            src={image}
-            alt="Floor Map"
-            draggable={false}
-            style={{
-              position: "absolute",
-              top: position.y,
-              left: position.x,
-              transform: `scale(${zoom})`,
-              transformOrigin: "center",
-            }}
-          />
+            <img
+                src={image}
+                alt="Floor Map"
+                draggable={false}
+                style={{
+                  position: "absolute",
+                  top: position.y,
+                  left: position.x,
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "center",
+                }}
+            />
         ) : (
-            <p>Loading...</p>
+            <p>Loading image...</p>
         )}
 
         <AssetMarkers

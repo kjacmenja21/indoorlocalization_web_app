@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Login from "../../components/Login/Login";
-import { AuthService } from "../../services/auth/authService";
-import { FloorMapService } from "../../services/floormapService.js";
 import AddFloormapForm from "../../components/AddFloormapForm/AddFloormapForm.jsx";
+import Login from "../../components/Login/Login";
 import Modal from "../../components/Modal/Modal.jsx";
-import imageConverterService from "../../services/imageConverterService.js";
+import { AuthService } from "../../services/auth/authService";
 import { cacheService } from "../../services/cacheService.js";
+import { FloorMapService } from "../../services/floormapService.js";
+import imageConverterService from "../../services/imageConverterService.js";
 
 import "./_homePage.scss";
 
