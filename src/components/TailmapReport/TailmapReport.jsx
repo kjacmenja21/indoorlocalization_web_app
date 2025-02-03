@@ -4,6 +4,7 @@ import { FloorMapService } from "../../services/floormapService.js";
 import { AssetService } from "../../services/assetService.js";
 import "./_tailmapReport.scss";
 import { cacheService } from "../../services/cacheService.js";
+import imageConverterService from "src/services/imageConverterService.js";
 
 function TailmapReport() {
   const [floormaps, setFloormaps] = useState([]);
@@ -19,7 +20,8 @@ function TailmapReport() {
   const canvasRef = useRef(null);
 
   const containerSize = { width: 800, height: 600 };
-  const imageSize = { width: 1600, height: 1100 };
+  const [imageSize, setImageSize] = useState({ width: 1600, height: 1100 });
+  const [imgSource, setImgSource] = useState("");
 
   // Deklaracija floormapOptions prije korištenja u JSX-u
   const floormapOptions = floormaps.map((floormap) => ({
@@ -96,6 +98,10 @@ function TailmapReport() {
     if (!selectedAsset) return;
 
     try {
+      FloorMapService.getFloorMapById(selectedFloormap.id).then((data) => {
+        setImageSize({ width: data.width, height: data.height });
+        setImgSource(imageConverterService.getFloorMapImageSource(data));
+      });
       const data = await AssetService.getAssetPositionHistory(
         selectedAsset.value,
         "2025-01-14T09:00:00",
@@ -109,7 +115,7 @@ function TailmapReport() {
   }
 
   useEffect(() => {
-    if (tailmapData && canvasRef.current) {
+    if (tailmapData && canvasRef.current && imageSize) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
 
@@ -235,35 +241,42 @@ function TailmapReport() {
                 });
               }}
             >
-              <img
-                src="https://fapa.jp/fair-2014/wp-content/uploads/2015/05/floormap_16.svg"
-                alt="Floor Map"
-                draggable={false}
-                style={{
-                  width: `${imageSize.width}px`,
-                  height: `${imageSize.height}px`,
-                  position: "absolute",
-                  top: position.y,
-                  left: position.x,
-                  transform: `scale(${zoom})`,
-                  transformOrigin: "top left",
-                }}
-              />
-              <canvas
-                ref={canvasRef}
-                width={imageSize.width}
-                height={imageSize.height}
-                style={{
-                  position: "absolute",
-                  top: position.y,
-                  left: position.x,
-                  width: `${imageSize.width}px`,
-                  height: `${imageSize.height}px`,
-                  transform: `scale(${zoom})`,
-                  transformOrigin: "top left",
-                  pointerEvents: "none",
-                }}
-              />
+              {imgSource ? (
+                  <img
+                      src={imgSource}
+                      alt="Floor Map"
+                      draggable={false}
+                      style={{
+                        width: `${imageSize.width}px`,
+                        height: `${imageSize.height}px`,
+                        position: "absolute",
+                        top: position.y,
+                        left: position.x,
+                        transform: `scale(${zoom})`,
+                        transformOrigin: "top left",
+                      }}
+                  />
+              ) : (
+                  <p>Loading image...</p>
+              )}
+              {imageSize ? (
+                  <canvas
+                      ref={canvasRef}
+                      width={imageSize.width}
+                      height={imageSize.height}
+                      style={{
+                        position: "absolute",
+                        top: position.y,
+                        left: position.x,
+                        width: `${imageSize.width}px`,
+                        height: `${imageSize.height}px`,
+                        transform: `scale(${zoom})`,
+                        transformOrigin: "top left",
+                        pointerEvents: "none",
+                      }}/>
+              ) : (
+                  <p>Loading image...</p>
+              )}
             </div>
           </div>
         </div>
