@@ -1,1 +1,108 @@
 @use "../../styles/variables";
+.asset-detail-page {
+  padding: 20px;
+
+  .details-modal {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow-x: hidden;
+
+    .details-modal-title {
+      padding-bottom: 15px;
+
+      h1 {
+        font-size: 20px;
+        margin: 0;
+      }
+    }
+
+    .details-modal-content {
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+        width: 100%;
+
+        div {
+          width: 80%;
+          margin-bottom: 20px;
+
+          label {
+            display: block;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 6px;
+          }
+
+          input[type="text"],
+          input[type="number"],
+          select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+
+            &:focus {
+              outline: none;
+              border-color: #4dabf7;
+            }
+          }
+        }
+
+        .checkbox-group {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          justify-content: flex-start;
+          width: 80%;
+
+          input[type="checkbox"] {
+            margin: 0;
+          }
+
+          label {
+            margin: 0;
+          }
+        }
+
+        .button-group {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          margin-top: 24px;
+          width: 80%;
+
+          button {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            height: 35px;
+            cursor: pointer;
+
+            &[type="submit"] {
+              background: #40c057;
+              color: white;
+
+              &:hover {
+                background: #37b24d;
+              }
+            }
+
+            &[type="button"] {
+              background: #dc3545;
+              color: white;
+
+              &:hover {
+                background: #c82333;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

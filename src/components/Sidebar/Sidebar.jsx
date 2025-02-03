@@ -74,12 +74,12 @@ const Sidebar = () => {
             </Link>
           </li>
           <li className="menu__item">
-            <button onClick={handleLogout} className="menu__link">
+            <Link to="/login" onClick={handleLogout} className="menu__link">
               <i className="menu__icon">
-                <BiLogOut/>
+                <BiLogOut />
               </i>
               <span className="menu__text">Logout</span>
-            </button>
+            </Link>
           </li>
         </>
       )}

@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import AssetMarkers from "../AssetMarker/AssetMarker";
+import { ThreeDots } from "react-loader-spinner";
 
-
-function FloormapDisplay({ width, height, image, assets, activeAsset, setActiveAsset }) {
+function FloormapDisplay({
+  width,
+  height,
+  image,
+  assets,
+  activeAsset,
+  setActiveAsset,
+}) {
   //const [activeAsset, setActiveAssetState] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -14,7 +21,6 @@ function FloormapDisplay({ width, height, image, assets, activeAsset, setActiveA
 
   //let imgSource;
   useEffect(() => {
-
     if (activeAsset) {
       const currentAsset = assets.find((asset) => asset.id === activeAsset.id);
       if (currentAsset) {
@@ -84,20 +90,34 @@ function FloormapDisplay({ width, height, image, assets, activeAsset, setActiveA
         }}
       >
         {image ? (
-            <img
-                src={image}
-                alt="Floor Map"
-                draggable={false}
-                style={{
-                  position: "absolute",
-                  top: position.y,
-                  left: position.x,
-                  transform: `scale(${zoom})`,
-                  transformOrigin: "center",
-                }}
-            />
+          <img
+            src={image}
+            alt="Floor Map"
+            draggable={false}
+            style={{
+              position: "absolute",
+              top: position.y,
+              left: position.x,
+              transform: `scale(${zoom})`,
+              transformOrigin: "center",
+            }}
+          />
         ) : (
-            <p>Loading image...</p>
+          <ThreeDots
+            visible={true}
+            height="80"
+            width="80"
+            color="rgb(0, 149, 218)"
+            radius="9"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "500px",
+            }}
+            wrapperClass=""
+          />
         )}
 
         <AssetMarkers

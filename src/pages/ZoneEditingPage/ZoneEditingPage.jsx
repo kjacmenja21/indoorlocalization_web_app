@@ -7,6 +7,7 @@ import ZoneMenu from "../../components/ZoneMenu/ZoneMenu.jsx";
 import { ZoneService } from "../../services/zoneService.js";
 import "./_zoneEditingPage.scss";
 import imageConverterService from "src/services/imageConverterService.js";
+import { ThreeDots } from "react-loader-spinner";
 
 function ZoneEditing() {
   const { floormapId } = useParams();
@@ -33,7 +34,8 @@ function ZoneEditing() {
         setFloormap(floormap);
 
         if (floormap) {
-          const zoneImage = imageConverterService.getFloorMapImageSource(floormap);
+          const zoneImage =
+            imageConverterService.getFloorMapImageSource(floormap);
           if (zoneImage) {
             setZoneImage(zoneImage);
           }
@@ -216,7 +218,11 @@ function ZoneEditing() {
     };
 
     // Convert for backend
-    const backendPayload = convertZoneData(newZoneData, floormapId, floormapScale);
+    const backendPayload = convertZoneData(
+      newZoneData,
+      floormapId,
+      floormapScale
+    );
     console.log("Zone submitted:", backendPayload);
 
     try {
@@ -343,7 +349,9 @@ function ZoneEditing() {
       setUpdatedZoneIndices(new Set());
     } catch (error) {
       console.error("Error updating zones:", error);
-      alert("An error occurred while updating the zones. Please try again later.");
+      alert(
+        "An error occurred while updating the zones. Please try again later."
+      );
     }
   };
 
@@ -365,7 +373,10 @@ function ZoneEditing() {
     setIsFinishedDrawing(false);
 
     console.log("New zone added:", finalizedZone);
-    console.log("Converted zone for backend:", convertZoneData(finalizedZone, floormapId));
+    console.log(
+      "Converted zone for backend:",
+      convertZoneData(finalizedZone, floormapId)
+    );
   };
 
   const handleDeleteZone = (zoneId) => {
@@ -385,7 +396,9 @@ function ZoneEditing() {
     <div className="zone-editing">
       <div className="zone-editing__container">
         <div className="zone-editing__header">
-          <h2 className="zone-editing__title">Floormap Detail for {floormapId}</h2>
+          <h2 className="zone-editing__title">
+            Floormap Detail for {floormapId}
+          </h2>
           <div className="zone-editing__actions">
             <button
               className={`zone-editing__button ${
@@ -428,7 +441,21 @@ function ZoneEditing() {
                 }}
               />
             ) : (
-              <p>Loading image...</p>
+              <ThreeDots
+                visible={true}
+                height="80"
+                width="80"
+                color="rgb(0, 149, 218)"
+                radius="9"
+                ariaLabel="three-dots-loading"
+                wrapperStyle={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "80vh",
+                }}
+                wrapperClass=""
+              />
             )}
 
             <ZoneStage
@@ -464,4 +491,3 @@ function ZoneEditing() {
 }
 
 export default ZoneEditing;
-
