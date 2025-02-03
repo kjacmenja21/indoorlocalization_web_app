@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import AssetMarkers from "../AssetMarker/AssetMarker";
-import { ThreeDots } from "react-loader-spinner";
 
 function FloormapDisplay({
   width,
@@ -103,25 +102,11 @@ function FloormapDisplay({
             }}
           />
         ) : (
-          <ThreeDots
-            visible={true}
-            height="80"
-            width="80"
-            color="rgb(0, 149, 218)"
-            radius="9"
-            ariaLabel="three-dots-loading"
-            wrapperStyle={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "500px",
-            }}
-            wrapperClass=""
-          />
+            <p>Loading...</p>
         )}
 
         <AssetMarkers
-          assets={assets}
+            assets={assets}
           zoom={zoom}
           position={position}
           setActiveAsset={setActiveAsset}

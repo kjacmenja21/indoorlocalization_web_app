@@ -7,7 +7,6 @@ import AddFloormapForm from "../../components/AddFloormapForm/AddFloormapForm.js
 import Modal from "../../components/Modal/Modal.jsx";
 import imageConverterService from "../../services/imageConverterService.js";
 import { cacheService } from "../../services/cacheService.js";
-import { ThreeDots } from "react-loader-spinner";
 
 import "./_homePage.scss";
 
@@ -109,23 +108,7 @@ function HomePage() {
                 {searchQuery ? (
                   "No floor maps found matching your search."
                 ) : (
-                  <ThreeDots
-                    visible={true}
-                    height="80"
-                    width="80"
-                    color="rgb(0, 149, 218)"
-                    radius="9"
-                    ariaLabel="three-dots-loading"
-                    wrapperStyle={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      minHeight: "60vh",
-                      minWidth: "80vw",
-                      marginTop: "-100px",
-                    }}
-                    wrapperClass=""
-                  />
+                    <p>Loading...</p>
                 )}
               </p>
             )}

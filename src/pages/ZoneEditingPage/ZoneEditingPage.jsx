@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Stage, Layer, Rect } from "react-konva";
 import { FloorMapService } from "../../services/floormapService.js";
 import ZoneStage from "../../components/ZoneStage/ZoneStage.jsx";
 import ZoneMenu from "../../components/ZoneMenu/ZoneMenu.jsx";
 import { ZoneService } from "../../services/zoneService.js";
 import "./_zoneEditingPage.scss";
 import imageConverterService from "src/services/imageConverterService.js";
-import { ThreeDots } from "react-loader-spinner";
 
 function ZoneEditing() {
   const { floormapId } = useParams();
@@ -441,21 +439,7 @@ function ZoneEditing() {
                 }}
               />
             ) : (
-              <ThreeDots
-                visible={true}
-                height="80"
-                width="80"
-                color="rgb(0, 149, 218)"
-                radius="9"
-                ariaLabel="three-dots-loading"
-                wrapperStyle={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "80vh",
-                }}
-                wrapperClass=""
-              />
+                <p>Loading...</p>
             )}
 
             <ZoneStage
