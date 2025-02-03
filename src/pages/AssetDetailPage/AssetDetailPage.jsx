@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { AssetService } from "../../services/assetService";
 import { FloorMapService } from "../../services/floormapService";
 import { AssetPropType } from "../../core/types/assetPropType";
+import Modal from "../../components/Modal/Modal";
 import "./_assetDetailPage.scss";
 
 function AssetDetailPage() {
@@ -18,9 +19,7 @@ function AssetDetailPage() {
     active: asset?.active || true,
   });
   const [floorMaps, setFloorMaps] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch floor maps for the combo box
   useEffect(() => {
     const fetchFloorMaps = async () => {
       try {
@@ -39,7 +38,7 @@ function AssetDetailPage() {
     try {
       const response = await AssetService.updateAsset(asset.id, updatedAsset);
       alert("Asset updated successfully!");
-      navigate("/assets"); // Navigate to asset list or back to asset detail
+      navigate("/assets");
     } catch (error) {
       alert("Error updating asset: " + error.message);
     }
@@ -52,6 +51,74 @@ function AssetDetailPage() {
       [name]: type === "checkbox" ? checked : value,
     });
   };
+
+  const EditForm = ({ closeModal }) => (
+    <form onSubmit={handleUpdateAsset}>
+      <div>
+        <label>Name</label>
+        <input
+          type="text"
+          name="name"
+          value={updatedAsset.name}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div>
+        <label>X Coordinate</label>
+        <input
+          type="number"
+          name="x"
+          value={updatedAsset.x}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div>
+        <label>Y Coordinate</label>
+        <input
+          type="number"
+          name="y"
+          value={updatedAsset.y}
+          onChange={handleChange}
+          required
+        />
+      </div>
+      <div>
+        <label>Floor Map</label>
+        <select
+          name="floormap_id"
+          value={updatedAsset.floormap_id || ""}
+          onChange={handleChange}
+          required
+        >
+          <option value="" disabled>
+            Select a Floor Map
+          </option>
+          {floorMaps.map((map) => (
+            <option key={map.id} value={map.id}>
+              {map.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="checkbox-group">
+        <input
+          type="checkbox"
+          name="active"
+          checked={updatedAsset.active}
+          onChange={handleChange}
+        />
+        <label>Active</label>
+      </div>
+      <div className="button-group">
+        <button type="submit">Update</button>
+        <button type="button" onClick={closeModal}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
 
   return (
     <div className="asset-detail-page">
@@ -78,74 +145,9 @@ function AssetDetailPage() {
             <strong>Floor Map Name:</strong> {asset.floorMapName}
           </p>
 
-          <button onClick={() => setIsEditing(true)}>Edit</button>
-
-          {isEditing && (
-            <form onSubmit={handleUpdateAsset}>
-              <div>
-                <label>Name:</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={updatedAsset.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>X Coordinate:</label>
-                <input
-                  type="number"
-                  name="x"
-                  value={updatedAsset.x}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Y Coordinate:</label>
-                <input
-                  type="number"
-                  name="y"
-                  value={updatedAsset.y}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Floor Map:</label>
-                <select
-                  name="floormap_id"
-                  value={updatedAsset.floormap_id || ""}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="" disabled>
-                    Select a Floor Map
-                  </option>
-                  {floorMaps.map((map) => (
-                    <option key={map.id} value={map.id}>
-                      {map.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label>Active:</label>
-                <input
-                  type="checkbox"
-                  name="active"
-                  checked={updatedAsset.active}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <button type="submit">Update Asset</button>
-              <button type="button" onClick={() => setIsEditing(false)}>
-                Cancel
-              </button>
-            </form>
-          )}
+          <Modal buttonText="  Edit  " title="Edit Asset">
+            <EditForm />
+          </Modal>
         </div>
       ) : (
         <p>No asset details available.</p>

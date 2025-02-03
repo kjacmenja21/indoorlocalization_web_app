@@ -5,9 +5,8 @@ import AssetSimulationService from "../../services/assetSimulationService.js";
 import FloormapDisplay from "../../components/FloormapDisplay/FloormapDisplay.jsx";
 import AssetSelector from "../../components/AssetSelector/AssetSelector.jsx";
 import "./_floormapDetailPage.scss";
-import {cacheService} from "src/services/cacheService.js";
+import { cacheService } from "src/services/cacheService.js";
 import imageConverterService from "../../services/imageConverterService.js";
-
 
 function FloormapDetail() {
   const { floormapId } = useParams();
@@ -17,7 +16,6 @@ function FloormapDetail() {
   const [floormapName, setFloormapName] = useState("");
   const [floormap, setFloormap] = useState("");
   const [imgSource, setImgSource] = useState("");
-
 
   const setActiveAsset = useCallback((asset) => {
     setActiveAssetState(asset);
@@ -65,7 +63,9 @@ function FloormapDetail() {
           <button onClick={handleEditZone} className="edit-button">
             Edit Zones
           </button>
-          <button onClick={handleDelete}>Delete Floormap</button>
+          <button onClick={handleDelete} className="delete-button">
+            Delete Floormap
+          </button>
         </div>
       </div>
 
