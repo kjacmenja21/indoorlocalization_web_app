@@ -21,8 +21,8 @@ paths = ['/app/node_modules/.bin']
 
 [phases.setup]
 nixPkgs = [
-    'nodejs_18',
-    'npm-9_x',
+    'nodejs_22',
+    'npm-10_x',
 ]
 nixOverlays = ['https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz']
 nixpkgsArchive = 'bdd2f439c62aa0b8aa97f5c784a965c23f968fe6'
