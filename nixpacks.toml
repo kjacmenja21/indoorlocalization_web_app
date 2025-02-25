@@ -15,13 +15,13 @@ cacheDirectories = ['node_modules/.cache']
 
 [phases.install]
 dependsOn = ['setup']
-cmds = ['npm ci']
+cmds = ['npm install --legacy-peer-deps']
 cacheDirectories = ['/root/.npm']
 paths = ['/app/node_modules/.bin']
 
 [phases.setup]
 nixPkgs = [
-    'nodejs_22',
+    'nodejs_18',
     'npm-9_x',
 ]
 nixOverlays = ['https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz']
